@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "568169801155",
+    "project_id": "pryvee-b9595",
+    "storage_bucket": "pryvee-b9595.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:568169801155:android:ead4bc1290f2511ff28976",
+        "android_client_info": {
+          "package_name": "com.pryvee.master"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "568169801155-3eoil5mnsh6rlj6gfkr9qvh7ac5r52pr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhS_pL1f82eQmNJlg_1nVGyIVs7v13pmI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "568169801155-3eoil5mnsh6rlj6gfkr9qvh7ac5r52pr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "568169801155-o5o1mppq0lq2rns93hrq6tdeejqtsggg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.pryvee.master"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
