@@ -1,36 +1,43 @@
-import 'package:pryvee/src/models/address_model.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+
 import 'package:pryvee/data/data_source_const.dart';
+import 'package:pryvee/src/models/address_model.dart';
 
 class UserData {
   AddressModel addressModel;
   String maritalStatus;
   bool isEmailValid;
-  String firstName;
-  String updatedAt;
-  String createdAt;
+  String uid;
   String fullName;
+  String firstName;
   String lastName;
-  String password;
-  String picture;
-  String userId;
-  String gender;
+  String createdAt;
+  String updatedAt;
   String email;
+  String gender;
   String phone;
+  String birthDate;
+  String picture;
+  List<String> contacts;
   UserData({
+    this.addressModel,
     this.maritalStatus,
     this.isEmailValid,
-    this.addressModel,
-    this.firstName,
-    this.updatedAt,
-    this.createdAt,
+    this.uid,
     this.fullName,
+    this.firstName,
     this.lastName,
-    this.password,
-    this.picture,
-    this.userId,
-    this.gender,
+    this.createdAt,
+    this.updatedAt,
     this.email,
+    this.gender,
     this.phone,
+    this.birthDate,
+    this.picture,
+    this.contacts,
   });
 
   factory UserData.fromJson(Map<String, dynamic> json) => UserData(
@@ -59,9 +66,136 @@ class UserData {
         createdAt:
             (json['createdAt'] == null) ? '' : json['createdAt'].toString(),
         lastName: (json['lastName'] == null) ? '' : json['lastName'].toString(),
-        password: (json['password'] == null) ? '' : json['password'].toString(),
-        userId: (json['userId'] == null) ? '' : json['userId'].toString(),
+        birthDate:
+            (json['birthDate'] == null) ? '' : json['birthDate'].toString(),
+        uid: (json['userId'] == null) ? '' : json['userId'].toString(),
         email: (json['email'] == null) ? '' : json['email'].toString(),
         phone: (json['phone'] == null) ? '' : json['phone'].toString(),
+        contacts:
+            (json['contacts'] == null) ? [] : json['contacts'] as List<String>,
       );
+
+  UserData copyWith({
+    AddressModel addressModel,
+    String maritalStatus,
+    bool isEmailValid,
+    String uid,
+    String fullName,
+    String firstName,
+    String lastName,
+    String createdAt,
+    String updatedAt,
+    String email,
+    String gender,
+    String phone,
+    String birthDate,
+    String picture,
+    List<String> contacts,
+  }) {
+    return UserData(
+      addressModel: addressModel ?? this.addressModel,
+      maritalStatus: maritalStatus ?? this.maritalStatus,
+      isEmailValid: isEmailValid ?? this.isEmailValid,
+      uid: uid ?? this.uid,
+      fullName: fullName ?? this.fullName,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      email: email ?? this.email,
+      gender: gender ?? this.gender,
+      phone: phone ?? this.phone,
+      birthDate: birthDate ?? this.birthDate,
+      picture: picture ?? this.picture,
+      contacts: contacts ?? this.contacts,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'addressModel': addressModel,
+      'maritalStatus': maritalStatus,
+      'isEmailValid': isEmailValid,
+      'uid': uid,
+      'fullName': fullName,
+      'firstName': firstName,
+      'lastName': lastName,
+      'createdAt': createdAt,
+      'updatedAt': updatedAt,
+      'email': email,
+      'gender': gender,
+      'phone': phone,
+      'birthDate': birthDate,
+      'picture': picture,
+      'contacts': contacts,
+    };
+  }
+
+  factory UserData.fromMap(Map<String, dynamic> map) {
+    return UserData(
+      addressModel:
+          AddressModel.fromMap(map['addressModel'] as Map<String, dynamic>),
+      maritalStatus: map['maritalStatus'] as String,
+      isEmailValid: map['isEmailValid'] as bool,
+      uid: map['uid'] as String,
+      fullName: map['fullName'] as String,
+      firstName: map['firstName'] as String,
+      lastName: map['lastName'] as String,
+      createdAt: map['createdAt'] as String,
+      updatedAt: map['updatedAt'] as String,
+      email: map['email'] as String,
+      gender: map['gender'] as String,
+      phone: map['phone'] as String,
+      birthDate: map['birthDate'] as String,
+      picture: map['picture'] as String,
+      contacts: List<String>.from(map['contacts'] as List<String>),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  @override
+  String toString() {
+    return 'UserData(addressModel: $addressModel, maritalStatus: $maritalStatus, isEmailValid: $isEmailValid, uid: $uid, fullName: $fullName, firstName: $firstName, lastName: $lastName, createdAt: $createdAt, updatedAt: $updatedAt, email: $email, gender: $gender, phone: $phone, birthDate: $birthDate, picture: $picture, contacts: $contacts)';
+  }
+
+  @override
+  bool operator ==(covariant UserData other) {
+    if (identical(this, other)) return true;
+
+    return other.addressModel == addressModel &&
+        other.maritalStatus == maritalStatus &&
+        other.isEmailValid == isEmailValid &&
+        other.uid == uid &&
+        other.fullName == fullName &&
+        other.firstName == firstName &&
+        other.lastName == lastName &&
+        other.createdAt == createdAt &&
+        other.updatedAt == updatedAt &&
+        other.email == email &&
+        other.gender == gender &&
+        other.phone == phone &&
+        other.birthDate == birthDate &&
+        other.picture == picture &&
+        listEquals(other.contacts, contacts);
+  }
+
+  @override
+  int get hashCode {
+    return addressModel.hashCode ^
+        maritalStatus.hashCode ^
+        isEmailValid.hashCode ^
+        uid.hashCode ^
+        fullName.hashCode ^
+        firstName.hashCode ^
+        lastName.hashCode ^
+        createdAt.hashCode ^
+        updatedAt.hashCode ^
+        email.hashCode ^
+        gender.hashCode ^
+        phone.hashCode ^
+        birthDate.hashCode ^
+        picture.hashCode ^
+        contacts.hashCode;
+  }
 }

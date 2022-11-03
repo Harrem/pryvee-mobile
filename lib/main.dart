@@ -102,9 +102,7 @@ class _MyApp extends State<MyApp> {
               Object args = routeSettings.arguments;
               switch (routeSettings.name) {
                 case '/':
-                  return MaterialPageRoute(
-                      builder: (_) =>
-                          OnBoardingWidget(sessionNotifier: sessionNotifier));
+                  return MaterialPageRoute(builder: (_) => OnBoardingWidget());
                 case '/SignIn':
                   return MaterialPageRoute(builder: (_) => SignInWidget());
                 case '/SignUp':
@@ -116,9 +114,7 @@ class _MyApp extends State<MyApp> {
                   return MaterialPageRoute(
                       builder: (_) => UserTabsWidget(currentTab: args));
                 default:
-                  return MaterialPageRoute(
-                      builder: (_) =>
-                          OnBoardingWidget(sessionNotifier: sessionNotifier));
+                  return MaterialPageRoute(builder: (_) => OnBoardingWidget());
               }
             },
           ),

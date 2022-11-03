@@ -199,7 +199,7 @@ class _SignInWidget extends State<SignInWidget> {
                                         apiSet
                                             .loginAPI(this.checkEmail.trim(),
                                                 this.checkPassword)
-                                            .then((value) {
+                                            .then((value) async {
                                           this.isLoading = !this.isLoading;
                                           setState(() {});
                                           if (value == null)
@@ -218,9 +218,11 @@ class _SignInWidget extends State<SignInWidget> {
                                             addLocalLocaleLanguageToSP("en_US");
                                             addLocalUserIdToSP(value.uid);
                                             addLocalEmailToSP(value.email);
-                                            this.isLoading = !this.isLoading;
                                             setState(() {});
-
+                                            await context
+                                                .read<UserProvider>()
+                                                .initUserData();
+                                            this.isLoading = !this.isLoading;
                                             Navigator.of(context)
                                                 .pushNamedAndRemoveUntil(
                                                     '/UserTabs',

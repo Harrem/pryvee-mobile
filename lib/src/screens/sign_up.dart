@@ -328,45 +328,43 @@ class _SignUpWidget extends State<SignUpWidget> {
                                                   this.checkFirstName,
                                                   this.checkLastName,
                                                   this.checkPassword1)
-                                              .then((value) {
-                                            this.isLoading = !this.isLoading;
-                                            setState(() {});
-                                            if (value == null)
-                                              showToast(context,
-                                                  "The email address is already taken.");
-                                            else {
-                                              Provider.of<SessionNotifier>(
-                                                      context,
-                                                      listen: false)
-                                                  .setLocalUserId(value.uid);
-                                              Provider.of<ThemeNotifier>(
-                                                      context,
-                                                      listen: false)
-                                                  .setLocalTheme(lightTheme);
-                                              addLocalThemeToSP(
-                                                  getStringThemeData(
-                                                      lightTheme));
-                                              addLocalLocaleLanguageToSP(
-                                                  "en_US");
-                                              addLocalUserIdToSP(value.uid);
-                                              addLocalEmailToSP(value.email);
+                                              .then(
+                                            (value) {
                                               this.isLoading = !this.isLoading;
                                               setState(() {});
-                                              Navigator.of(context)
-                                                  .pushNamedAndRemoveUntil(
-                                                      '/UserTabs',
-                                                      (Route<dynamic> route) =>
-                                                          false,
-                                                      arguments: 0);
-                                            }
-                                          }).catchError(
-                                                  (onError) => setState(() {
-                                                        showToast(
-                                                            context, onError,
-                                                            seconds: 3);
-                                                        this.isLoading =
-                                                            !this.isLoading;
-                                                      }));
+                                              if (value == null)
+                                                showToast(context,
+                                                    "The email address is already taken.");
+                                              else {
+                                                addLocalThemeToSP(
+                                                    getStringThemeData(
+                                                        lightTheme));
+                                                addLocalLocaleLanguageToSP(
+                                                    "en_US");
+                                                addLocalUserIdToSP(value.uid);
+                                                addLocalEmailToSP(value.email);
+                                                this.isLoading =
+                                                    !this.isLoading;
+                                                setState(() {});
+                                                Navigator.of(context)
+                                                    .pushNamedAndRemoveUntil(
+                                                        '/UserTabs',
+                                                        (Route<dynamic>
+                                                                route) =>
+                                                            false,
+                                                        arguments: 0);
+                                              }
+                                            },
+                                          ).catchError(
+                                            (onError) => setState(
+                                              () {
+                                                showToast(context, onError,
+                                                    seconds: 3);
+                                                this.isLoading =
+                                                    !this.isLoading;
+                                              },
+                                            ),
+                                          );
                                         }
                                       },
                                 child: Text(

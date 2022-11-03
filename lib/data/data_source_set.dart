@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart' as fire;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pryvee/src/providers_utils/auth_provider.dart';
@@ -39,7 +39,7 @@ class DataSourceSet {
     return (cloudinaryResponse == null) ? null : cloudinaryResponse;
   }
 
-  Future<fire.User> loginAPI(String email, String password) async {
+  Future<User> loginAPI(String email, String password) async {
     var user = await AuthProvider()
         .signInWithEmailAndPassword(email: email, password: password);
 
@@ -65,25 +65,34 @@ class DataSourceSet {
     });
   }
 
-  Future<fire.User> registerAPI(
+  Future<User> registerAPI(
       String email, String firstName, String lastName, String password) async {
     final auth = AuthProvider();
     var user =
         await auth.signUpWithEmailAndPassword(email: email, password: password);
-    DocumentSnapshot<Object> documentSnapshot = await users.doc(email).get();
-    Map<String, String> map = {
-      'userId': user.uid,
-      'joinedDate': DateTime.now().millisecondsSinceEpoch.toString(),
-      'picture': 'user/default-profile-picture',
-      'maritalStatus': 'PREFER_NOT_TO_SAY',
-      'gender': 'PREFER_NOT_TO_SAY',
-      'firstName': firstName,
-      'lastName': lastName,
-      'email': email,
-    };
+    user.updateDisplayName("$firstName $lastName");
+    UserData userData = UserData(
+      uid: user.uid,
+      firstName: firstName,
+      lastName: lastName,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+
+    DocumentSnapshot<Object> documentSnapshot =
+        await users.doc(userData.uid).get();
+    // Map<String, String> map = {
+    //   'userId': user.uid,
+    //   'joinedDate': DateTime.now().millisecondsSinceEpoch.toString(),
+    //   'picture': 'user/default-profile-picture',
+    //   'maritalStatus': 'PREFER_NOT_TO_SAY',
+    //   'gender': 'PREFER_NOT_TO_SAY',
+    //   'firstName': firstName,
+    //   'lastName': lastName,
+    //   'email': email,
+    // };
 
     if (documentSnapshot == null || documentSnapshot.exists == false) {
-      await users.doc(email).set(map);
+      await users.doc(user.uid).set(userData.toMap());
     }
 
     if (user != null)

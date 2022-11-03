@@ -1,4 +1,5 @@
 import 'package:provider/provider.dart';
+import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:pryvee/src/widgets/UserAvatarButtonWidget.dart';
@@ -29,7 +30,6 @@ class _UserTabsWidget extends State<UserTabsWidget> {
       ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
   DataSourceGet apiGet = DataSourceGet();
   UserData user;
-  bool isReady = false;
   List<CommunSelectModel> communSelectModelList = [
     CommunSelectModel("Home", true),
     CommunSelectModel("Post", true),
@@ -40,15 +40,6 @@ class _UserTabsWidget extends State<UserTabsWidget> {
   void refreshTheView(UserData user) {
     this.user = user;
     setState(() {});
-  }
-
-  Future<void> getCurrentUserAPI() async {
-    await apiGet
-        .getCurrentUserAPI()
-        .then((value) => this.user = value)
-        .then((value) => setState(() {
-              isReady = true;
-            }));
   }
 
   void selectTab(int index) {
@@ -84,7 +75,6 @@ class _UserTabsWidget extends State<UserTabsWidget> {
   void initState() {
     super.initState();
     if (this.mounted) {
-      getCurrentUserAPI();
       selectTab(widget.currentTab);
     }
   }
@@ -96,14 +86,20 @@ class _UserTabsWidget extends State<UserTabsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
+    user = Provider.of<UserProvider>(context).userData;
+    debugPrint("$user");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
         leading: IconButton(
-          onPressed: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => EditAccountWidget())),
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditAccountWidget(
+                        user: user,
+                        refreshTheView: refreshTheView,
+                      ))),
           splashRadius: 24.0,
           icon: Icon(
             Icons.sort,
@@ -120,9 +116,15 @@ class _UserTabsWidget extends State<UserTabsWidget> {
               ),
         ),
         actions: <Widget>[
-          isReady
-              ? UserAvatarButtonWidget(profileUrl: user.picture)
-              : UserAvatarButtonWidget(),
+          IconButton(
+              onPressed: () {
+                pryveeSignOut(context);
+              },
+              icon: Icon(
+                Icons.output_rounded,
+                color: Colors.black,
+              )),
+          UserAvatarButtonWidget(profileUrl: user.picture)
         ],
       ),
       body: SafeArea(
