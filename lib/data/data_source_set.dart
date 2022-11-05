@@ -121,28 +121,9 @@ class DataSourceSet {
     return UserData.fromJson(map);
   }
 
-  Future<UserData> editUserInfoAPI(
-      {String maritalStatus,
-      String email,
-      String firstName,
-      String lastName,
-      String picture,
-      String gender}) async {
-    Map<String, String> map = {
-      'maritalStatus': maritalStatus,
-      'firstName': firstName,
-      'lastName': lastName,
-      'picture': picture,
-      'gender': gender,
-    };
-    await users.doc(email).update(map);
-    final doc = await users.doc(email).get();
-    return UserData.fromJson(doc.data());
-  }
-
-  Future<String> updateProfilePicAPI({File file, String email}) async {
+  Future<String> updateProfilePicAPI({File file, String uid}) async {
     FirebaseStorage storage = FirebaseStorage.instance;
-    final proPicRef = storage.ref('$email/profilePic/proPic.jpg');
+    final proPicRef = storage.ref('$uid/profilePic/proPic.jpg');
     String url;
 
     await proPicRef.putFile(file).then((p0) async {
@@ -158,14 +139,6 @@ class DataSourceSet {
     });
     debugPrint(url);
     return url;
-  }
-
-  Future<bool> isUserExistAPI(String email) async {
-    DocumentSnapshot<Object> documentSnapshot = await users.doc(email).get();
-    if (documentSnapshot == null || documentSnapshot.exists == false)
-      return false;
-    else
-      return true;
   }
 
   Future<Post> addNewPostAPI(

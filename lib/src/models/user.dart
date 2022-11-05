@@ -21,7 +21,7 @@ class UserData {
   String phone;
   String birthDate;
   String picture;
-  List<String> contacts;
+  List<dynamic> contacts;
   UserData({
     this.addressModel,
     this.maritalStatus,
@@ -72,7 +72,7 @@ class UserData {
         email: (json['email'] == null) ? '' : json['email'].toString(),
         phone: (json['phone'] == null) ? '' : json['phone'].toString(),
         contacts:
-            (json['contacts'] == null) ? [] : json['contacts'] as List<String>,
+            (json['contacts'] == null) ? [] : json['contacts'] as List<dynamic>,
       );
 
   UserData copyWith({
@@ -134,7 +134,8 @@ class UserData {
   factory UserData.fromMap(Map<String, dynamic> map) {
     return UserData(
       addressModel:
-          AddressModel.fromMap(map['addressModel'] as Map<String, dynamic>),
+          AddressModel.fromMap(map['addressModel'] as Map<String, dynamic>) ??
+              AddressModel(),
       maritalStatus: map['maritalStatus'] as String,
       isEmailValid: map['isEmailValid'] as bool,
       uid: map['uid'] as String,
@@ -147,7 +148,7 @@ class UserData {
       gender: map['gender'] as String,
       phone: map['phone'] as String,
       birthDate: map['birthDate'] as String,
-      picture: map['picture'] as String,
+      picture: (map['picture'] as String) ?? DEFAULT_USER_PICTURE,
       contacts: List<String>.from(map['contacts'] as List<String>),
     );
   }

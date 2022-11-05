@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_password.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_email.dart';
@@ -18,10 +20,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 
 class AccountWidget extends StatefulWidget {
-  AccountWidget({Key key, @required this.user, @required this.refreshTheView})
-      : super(key: key);
-  UserData user;
-  ValueChanged<UserData> refreshTheView;
+  AccountWidget({Key key}) : super(key: key);
   @override
   _AccountWidgetState createState() => _AccountWidgetState();
 }
@@ -31,12 +30,6 @@ class _AccountWidgetState extends State<AccountWidget> {
   DataSourceSet apiSet = DataSourceSet();
   bool isLoading1 = false;
   bool isLoading2 = false;
-
-  void refreshTheView(UserData user) {
-    widget.user = user;
-    setState(() {});
-    widget.refreshTheView(user);
-  }
 
   void updateProfilePictureRefreshTheView(File file) {
     // setState(() => this.isLoading1 = !this.isLoading1);
@@ -63,76 +56,41 @@ class _AccountWidgetState extends State<AccountWidget> {
   //         showToast(context, "An error occurred, please try again later.");
   //     });
 
-  Future<void> getCurrentUserAPI() => apiGet
-      .getCurrentUserAPI()
-      .then((value) => setState(() => widget.user = value));
-
-  @override
-  void initState() {
-    super.initState();
-    if (mounted) {
-      getCurrentUserAPI();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context).userData;
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       children: [
         Center(
-          child: CustomInkWell(
-            onTap: () => showAddNewPhotoSheet(
-                context, updateProfilePictureRefreshTheView, null),
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(2.0),
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              Container(
+                padding: EdgeInsets.all(2.0),
+                width: 100.0,
+                height: 100.0,
+                decoration: BoxDecoration(
+                  border: Border.all(color: APP_COLOR, width: 1.0),
+                  borderRadius: BorderRadius.circular(100.0),
+                  color: Colors.transparent,
+                ),
+                child: SizedBox(
                   width: 100.0,
                   height: 100.0,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: APP_COLOR, width: 1.0),
-                    borderRadius: BorderRadius.circular(100.0),
-                    color: Colors.transparent,
-                  ),
-                  child: SizedBox(
-                    width: 100.0,
-                    height: 100.0,
-                    child: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                        widget.user.picture,
-                      ),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      user.picture,
                     ),
                   ),
                 ),
-                Visibility(
-                  visible: this.isLoading1 == false,
-                  child: Container(
-                    padding: EdgeInsets.all(2.0),
-                    height: 22.0,
-                    width: 22.0,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Theme.of(context).primaryColor, width: 1.0),
-                      borderRadius: BorderRadius.circular(100.0),
-                      color: APP_COLOR,
-                    ),
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 14.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
         SizedBox(height: 12.0),
         Text(
-          '${widget.user.firstName} ${widget.user.lastName}',
+          '${user.firstName} ${user.lastName}',
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headline2.merge(
                 TextStyle(
@@ -141,7 +99,7 @@ class _AccountWidgetState extends State<AccountWidget> {
               ),
         ),
         Text(
-          widget.user.email,
+          user.email,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.caption.merge(
                 TextStyle(
@@ -250,11 +208,8 @@ class _AccountWidgetState extends State<AccountWidget> {
         ),
         SizedBox(height: 10.0),
         CommunChipWidget(
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditAccountWidget(
-                      user: widget.user, refreshTheView: refreshTheView))),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => EditAccountWidget())),
           color: Theme.of(context).focusColor.withOpacity(0.4),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),
@@ -284,11 +239,8 @@ class _AccountWidgetState extends State<AccountWidget> {
         SizedBox(height: 6.0),
         CommunChipWidget(
           color: Theme.of(context).focusColor.withOpacity(0.4),
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditEmailWidget(
-                      user: widget.user, refreshTheView: refreshTheView))),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => EditEmailWidget())),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),
           child: Row(
@@ -316,11 +268,8 @@ class _AccountWidgetState extends State<AccountWidget> {
         ),
         SizedBox(height: 6.0),
         CommunChipWidget(
-          onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditPasswordWidget(
-                      user: widget.user, refreshTheView: refreshTheView))),
+          onTap: () => Navigator.push(context,
+              MaterialPageRoute(builder: (context) => EditPasswordWidget())),
           color: Theme.of(context).focusColor.withOpacity(0.4),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),

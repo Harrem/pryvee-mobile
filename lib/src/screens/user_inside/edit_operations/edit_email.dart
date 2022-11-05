@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomCircularProgressIndicatorWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
@@ -5,6 +7,8 @@ import 'package:pryvee/data/data_source_set.dart';
 import 'package:pryvee/config/ui_icons.dart';
 import 'package:pryvee/src/models/user.dart';
 import 'package:flutter/material.dart';
+
+import '../../../utils/commun_mix_utility.dart';
 
 // ignore: must_be_immutable
 class EditEmailWidget extends StatefulWidget {
@@ -35,6 +39,7 @@ class _EditEmailWidget extends State<EditEmailWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -69,8 +74,7 @@ class _EditEmailWidget extends State<EditEmailWidget> {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: NetworkImage(
-                    //  widget.user.picture,
-                    'https://www.shareicon.net/data/512x512/2017/01/06/868320_people_512x512.png',
+                    widget.user.picture,
                   ),
                 ),
               ),
@@ -120,26 +124,25 @@ class _EditEmailWidget extends State<EditEmailWidget> {
                   edgeInsetsGeometry: EdgeInsets.all(14.0),
                 )
               : CommunTextButtonWidget(
-                  onPressed:
-                      // (this.checkEmail.isEmpty || this.checkEmail == widget.user.email)
-                      //     ? null
-                      //     :
-                      () {
-                    // if (isValidEmail(this.checkEmail) == false)
-                    //   showToast(context, "Please enter a valid email address.");
-                    // else {
-                    //   setState(() => this.isLoading = !this.isLoading);
-                    //   apiSet.editUser(this.checkEmail, widget.user.firstName, widget.user.lastName, widget.user.maritalStatus, widget.user.gender, widget.user.picture).then((value) {
-                    //     setState(() => this.isLoading = !this.isLoading);
-                    //     if (value != null) {
-                    //       setState(() => widget.user = value);
-                    //       widget.refreshTheView(value);
-                    //       Navigator.of(context).pop();
-                    //     } else
-                    //       showToast(context, "An error occurred, please try again later.");
-                    //   }).catchError((onError) => setState(() => this.isLoading = !this.isLoading));
-                    // }
-                  },
+                  onPressed: (this.checkEmail.isEmpty ||
+                          this.checkEmail == widget.user.email)
+                      ? null
+                      : () async {
+                          if (isValidEmail(this.checkEmail) == false)
+                            showToast(
+                                context, "Please enter a valid email address.");
+                          else {
+                            setState(() => this.isLoading = !this.isLoading);
+                            await user
+                                .updateEmail(this.checkEmail)
+                                .then((value) {
+                              setState(() => this.isLoading = !this.isLoading);
+                              Navigator.of(context).pop();
+                              showToast(context, "Email address updated");
+                            }).catchError((onError) => setState(
+                                    () => this.isLoading = !this.isLoading));
+                          }
+                        },
                   color: APP_COLOR,
                   shape: StadiumBorder(),
                   child: Text(

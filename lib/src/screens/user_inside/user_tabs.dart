@@ -56,8 +56,7 @@ class _UserTabsWidget extends State<UserTabsWidget> {
         widget.currentPage = PostsWidget();
         break;
       case 3:
-        widget.currentPage =
-            AccountWidget(user: this.user, refreshTheView: refreshTheView);
+        widget.currentPage = AccountWidget();
         break;
     }
     setState(() {});
@@ -97,8 +96,7 @@ class _UserTabsWidget extends State<UserTabsWidget> {
               context,
               MaterialPageRoute(
                   builder: (context) => EditAccountWidget(
-                        user: user,
-                        refreshTheView: refreshTheView,
+                        userData: user,
                       ))),
           splashRadius: 24.0,
           icon: Icon(

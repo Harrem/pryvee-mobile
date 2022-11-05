@@ -1,3 +1,6 @@
+import 'package:provider/provider.dart';
+import 'package:pryvee/src/models/user.dart';
+import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomCircularProgressIndicatorWidget.dart';
 import 'package:pryvee/src/widgets/modal_bottom_sheet/add_new_photo_sheet.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
@@ -10,20 +13,14 @@ import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/src/utils/date_utility.dart';
 import 'package:pryvee/data/data_source_set.dart';
 import 'package:pryvee/config/ui_icons.dart';
-import 'package:pryvee/src/models/user.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 
 import '../../../utils/commun_mix_utility.dart';
 
 // ignore: must_be_immutable
 class EditAccountWidget extends StatefulWidget {
-  EditAccountWidget(
-      {Key key, @required this.user, @required this.refreshTheView})
-      : super(key: key);
-  UserData user;
-  ValueChanged<UserData> refreshTheView;
-
+  UserData userData;
+  EditAccountWidget({Key key, @required this.userData}) : super(key: key);
   @override
   _EditAccountWidget createState() => _EditAccountWidget();
 }
@@ -49,56 +46,18 @@ class _EditAccountWidget extends State<EditAccountWidget> {
   String checkFirstName = '';
   String checkLastName = '';
   bool isLoading = false;
-
-  void updateProfilePictureRefreshTheView(File file) {
-    setState(() => this.isLoading = !this.isLoading);
-    apiSet
-        .updateProfilePicAPI(file: file, email: widget.user.email)
-        .then((value) => apiSet
-                .editUserInfoAPI(
-                    email: widget.user.email,
-                    firstName: widget.user.firstName,
-                    lastName: widget.user.lastName,
-                    maritalStatus: widget.user.maritalStatus,
-                    gender: widget.user.gender,
-                    picture: '$value')
-                .then((UserData user) {
-              setState(() => this.isLoading = !this.isLoading);
-              if (user is UserData) {
-                setState(() => widget.user = user);
-                widget.refreshTheView(user);
-              } else
-                showToast(
-                    context, "An error occurred, please try again later.");
-            }).catchError((onError) =>
-                    setState(() => this.isLoading = !this.isLoading)))
-        .catchError(
-            (onError) => setState(() => this.isLoading = !this.isLoading));
-  }
-
-  // void deleteProfilePictureRefreshTheView(bool value) =>
-  //     apiSet.editUser(widget.user.email, widget.user.firstName, widget.user.lastName, widget.user.maritalStatus, widget.user.gender, '$CLOUDINARY_IMAGE_BASE_URL/user/default-profile').then((value) {
-  //       if (value is User) {
-  //         setState(() => widget.user = value);
-  //         widget.refreshTheView(value);
-  //       } else
-  //         showToast(context, "An error occurred, please try again later.");
-  //     });
-
   @override
   void initState() {
     super.initState();
-    if (mounted) {
-      this.checkFirstNameController.text = widget.user.firstName;
-      this.checkLastNameController.text = widget.user.lastName;
-      this.checkFirstName = widget.user.firstName;
-      this.checkLastName = widget.user.lastName;
-      setState(() {});
-    }
+    this.checkFirstNameController.text = widget.userData.firstName;
+    this.checkLastNameController.text = widget.userData.lastName;
+    this.checkFirstName = widget.userData.firstName;
+    this.checkLastName = widget.userData.lastName;
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context);
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -129,29 +88,57 @@ class _EditAccountWidget extends State<EditAccountWidget> {
           ),
           SizedBox(height: 8.0),
           Center(
-            child: CustomInkWell(
-              onTap: () => showAddNewPhotoSheet(
-                  context, updateProfilePictureRefreshTheView, null),
-              child: Container(
-                padding: EdgeInsets.all(2.0),
-                width: 160.0,
-                height: 160.0,
-                decoration: BoxDecoration(
-                  border: Border.all(color: APP_COLOR, width: 1.0),
-                  borderRadius: BorderRadius.circular(100.0),
-                  color: Colors.transparent,
-                ),
-                child: SizedBox(
-                  width: 100.0,
-                  height: 100.0,
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      widget.user.picture ??
-                          'https://www.shareicon.net/data/512x512/2017/01/06/868320_people_512x512.png',
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CustomInkWell(
+                  onTap: () async {
+                    await showAddNewPhotoSheet(context);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(2.0),
+                    width: 160.0,
+                    height: 160.0,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: APP_COLOR, width: 1.0),
+                      borderRadius: BorderRadius.circular(100.0),
+                      color: Colors.transparent,
+                    ),
+                    child: SizedBox(
+                      width: 100.0,
+                      height: 100.0,
+                      child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                          user.userData.picture,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Visibility(
+                    visible: this.isLoading == false,
+                    child: Container(
+                      padding: EdgeInsets.all(2.0),
+                      height: 26.0,
+                      width: 26.0,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).primaryColor, width: 1.0),
+                        borderRadius: BorderRadius.circular(100.0),
+                        color: APP_COLOR,
+                      ),
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                        size: 20.0,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(height: 8.0),
@@ -274,12 +261,12 @@ class _EditAccountWidget extends State<EditAccountWidget> {
                 onSelected: (bool value) {
                   this.genderList.map((e) => e.selected = false).toList();
                   communSelectModel.selected = true;
-                  widget.user.gender = communSelectModel.name;
+                  user.userData.gender = communSelectModel.name;
                   setState(() {});
                 },
                 label: AppLocalizations.of(context)
                     .translate(communSelectModel.name),
-                selected: widget.user.gender == communSelectModel.name,
+                selected: user.userData.gender == communSelectModel.name,
               );
             }),
           ),
@@ -304,12 +291,13 @@ class _EditAccountWidget extends State<EditAccountWidget> {
                         .map((e) => e.selected = false)
                         .toList();
                     communSelectModel.selected = true;
-                    widget.user.maritalStatus = communSelectModel.name;
+                    user.userData.maritalStatus = communSelectModel.name;
                     setState(() {});
                   },
                   label: AppLocalizations.of(context)
                       .translate(communSelectModel.name),
-                  selected: widget.user.maritalStatus == communSelectModel.name,
+                  selected:
+                      user.userData.maritalStatus == communSelectModel.name,
                 );
               },
             ),
@@ -326,19 +314,18 @@ class _EditAccountWidget extends State<EditAccountWidget> {
                       ? null
                       : () {
                           setState(() => this.isLoading = !this.isLoading);
-                          apiSet
+                          user
                               .editUserInfoAPI(
-                                  email: widget.user.email,
+                                  email: user.userData.email,
                                   firstName: this.checkFirstName,
                                   lastName: this.checkLastName,
-                                  maritalStatus: widget.user.maritalStatus,
-                                  gender: widget.user.gender,
-                                  picture: widget.user.picture)
+                                  maritalStatus: user.userData.maritalStatus,
+                                  gender: user.userData.gender,
+                                  picture: user.userData.picture)
                               .then((value) {
                             setState(() => this.isLoading = !this.isLoading);
                             if (value != null) {
-                              setState(() => widget.user = value);
-                              widget.refreshTheView(widget.user);
+                              setState(() => user.userData = value);
                               Navigator.of(context).pop();
                             } else
                               showToast(context,
