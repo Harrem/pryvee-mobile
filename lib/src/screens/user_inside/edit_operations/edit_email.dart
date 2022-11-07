@@ -12,10 +12,8 @@ import '../../../utils/commun_mix_utility.dart';
 
 // ignore: must_be_immutable
 class EditEmailWidget extends StatefulWidget {
-  EditEmailWidget({Key key, @required this.user, @required this.refreshTheView})
-      : super(key: key);
+  EditEmailWidget({Key key, @required this.user}) : super(key: key);
   UserData user;
-  ValueChanged<UserData> refreshTheView;
 
   @override
   _EditEmailWidget createState() => _EditEmailWidget();
@@ -31,8 +29,8 @@ class _EditEmailWidget extends State<EditEmailWidget> {
   void initState() {
     super.initState();
     if (mounted) {
-      // this.checkEmailController.text = widget.user.email;
-      // this.checkEmail = widget.user.email;
+      this.checkEmailController.text = widget.user.email;
+      this.checkEmail = widget.user.email;
       setState(() {});
     }
   }

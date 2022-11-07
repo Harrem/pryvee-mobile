@@ -1,3 +1,4 @@
+import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomCircularProgressIndicatorWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/SocialMediaWidget.dart';
@@ -34,6 +35,7 @@ class _SignUpWidget extends State<SignUpWidget> {
   bool isLoading = false;
 
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       backgroundColor: APP_COLOR,
       extendBodyBehindAppBar: true,
@@ -329,7 +331,7 @@ class _SignUpWidget extends State<SignUpWidget> {
                                                   this.checkLastName,
                                                   this.checkPassword1)
                                               .then(
-                                            (value) {
+                                            (value) async {
                                               this.isLoading = !this.isLoading;
                                               setState(() {});
                                               if (value == null)
@@ -345,7 +347,8 @@ class _SignUpWidget extends State<SignUpWidget> {
                                                 addLocalEmailToSP(value.email);
                                                 this.isLoading =
                                                     !this.isLoading;
-                                                setState(() {});
+                                                await userProvider
+                                                    .initUserData();
                                                 Navigator.of(context)
                                                     .pushNamedAndRemoveUntil(
                                                         '/UserTabs',

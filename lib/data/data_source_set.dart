@@ -72,11 +72,12 @@ class DataSourceSet {
         await auth.signUpWithEmailAndPassword(email: email, password: password);
     user.updateDisplayName("$firstName $lastName");
     UserData userData = UserData(
-      uid: user.uid,
-      firstName: firstName,
-      lastName: lastName,
-      createdAt: DateTime.now().toIso8601String(),
-    );
+        uid: user.uid,
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        createdAt: DateTime.now().toIso8601String(),
+        picture: DEFAULT_USER_PICTURE);
 
     DocumentSnapshot<Object> documentSnapshot =
         await users.doc(userData.uid).get();

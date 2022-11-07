@@ -208,8 +208,10 @@ class _AccountWidgetState extends State<AccountWidget> {
         ),
         SizedBox(height: 10.0),
         CommunChipWidget(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => EditAccountWidget())),
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditAccountWidget(userData: user))),
           color: Theme.of(context).focusColor.withOpacity(0.4),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),
@@ -239,8 +241,10 @@ class _AccountWidgetState extends State<AccountWidget> {
         SizedBox(height: 6.0),
         CommunChipWidget(
           color: Theme.of(context).focusColor.withOpacity(0.4),
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => EditEmailWidget())),
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditEmailWidget(user: user))),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),
           child: Row(

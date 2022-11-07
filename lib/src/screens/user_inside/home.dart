@@ -1,8 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pryvee/config/app_config.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
 import 'package:pryvee/src/widgets/LivePostItemWidget.dart';
-import 'package:pryvee/src/widgets/PostItemWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_get.dart';
 import 'package:flutter/material.dart';

@@ -13,17 +13,17 @@ class UserProvider extends ChangeNotifier {
   FirebaseAuth auth = FirebaseAuth.instance;
 
   UserProvider() {
-    if (auth.currentUser != null) uid = auth.currentUser.uid;
     users = FirebaseFirestore.instance.collection('users');
   }
 
   Future<UserData> initUserData() async {
+    uid = auth.currentUser.uid;
     print("Uid: $uid");
     print("initializing User Data");
     var documentSnapshot = await users.doc(uid).get();
+    print(documentSnapshot.data());
     if (documentSnapshot != null || documentSnapshot.exists) {
       userData = UserData.fromJson(documentSnapshot.data());
-      print(userData.firstName);
       debugPrint(userData.toJson());
       return userData;
     } else {
@@ -99,5 +99,10 @@ class UserProvider extends ChangeNotifier {
 
   Future<void> updateUserData() async {
     users.doc(auth.currentUser.uid).update(userData.toMap());
+  }
+
+  void signOut() {
+    uid = "";
+    userData = null;
   }
 }

@@ -86,7 +86,6 @@ class _UserTabsWidget extends State<UserTabsWidget> {
   @override
   Widget build(BuildContext context) {
     user = Provider.of<UserProvider>(context).userData;
-    debugPrint("$user");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
