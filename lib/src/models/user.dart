@@ -68,7 +68,7 @@ class UserData {
         lastName: (json['lastName'] == null) ? '' : json['lastName'].toString(),
         birthDate:
             (json['birthDate'] == null) ? '' : json['birthDate'].toString(),
-        uid: (json['userId'] == null) ? '' : json['userId'].toString(),
+        uid: (json['uid'] == null) ? '' : json['uid'].toString(),
         email: (json['email'] == null) ? '' : json['email'].toString(),
         phone: (json['phone'] == null) ? '' : json['phone'].toString(),
         contacts:

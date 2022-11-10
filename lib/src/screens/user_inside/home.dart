@@ -4,6 +4,8 @@ import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_get.dart';
 import 'package:flutter/material.dart';
 
+import 'add_operations/add_new_post.dart';
+
 class HomeWidget extends StatefulWidget {
   @override
   _HomeWidgetState createState() => _HomeWidgetState();
@@ -80,6 +82,16 @@ class _HomeWidgetState extends State<HomeWidget> {
           searchTextEditingController: this.searchTextEditingController,
         ),
         SizedBox(height: 12.0),
+        Column(
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => AddNewPosWidget())),
+              child: Text("Going out?"),
+            )
+          ],
+        ),
+        SizedBox(height: 12.0),
         Row(
           children: [
             Expanded(
@@ -106,6 +118,7 @@ class _HomeWidgetState extends State<HomeWidget> {
         ),
         SizedBox(height: 12.0),
         ListView.separated(
+          physics: NeverScrollableScrollPhysics(),
           separatorBuilder: (context, index) => SizedBox(height: 8.0),
           padding: EdgeInsets.zero,
           shrinkWrap: true,
@@ -115,41 +128,6 @@ class _HomeWidgetState extends State<HomeWidget> {
           },
         ),
         SizedBox(height: 12.0),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Recent post'.toUpperCase(),
-                style: Theme.of(context).textTheme.headline2.merge(
-                      TextStyle(
-                        fontSize: 10.0,
-                      ),
-                    ),
-              ),
-            ),
-            SizedBox(width: 8.0),
-            Text(
-              'See all'.toUpperCase(),
-              style: Theme.of(context).textTheme.headline2.merge(
-                    TextStyle(
-                      fontSize: 10.0,
-                      color: APP_COLOR,
-                    ),
-                  ),
-            ),
-          ],
-        ),
-        SizedBox(height: 12.0),
-        ListView.separated(
-          physics: NeverScrollableScrollPhysics(),
-          separatorBuilder: (context, index) => SizedBox(height: 8.0),
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          itemCount: 7,
-          itemBuilder: (context, index) {
-            return LivePostItemWidget();
-          },
-        ),
       ],
     );
   }
