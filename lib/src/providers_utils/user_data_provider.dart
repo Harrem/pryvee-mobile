@@ -32,6 +32,15 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> uploadUserData() async {
+    await users.doc(uid).update(userData.toMap()).then((value) {
+      debugPrint("UserData uploaded");
+      updateUserData();
+    }).catchError((e) {
+      return Future.error(e);
+    });
+  }
+
   Future<bool> checkUser() async {
     if (FirebaseAuth.instance.currentUser == null) {
       return null;

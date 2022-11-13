@@ -10,6 +10,7 @@ import 'package:pryvee/src/providers_utils/session_notifier.dart';
 import 'package:pryvee/src/providers_utils/theme_notifier.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/forgot_password.dart';
+import 'package:pryvee/src/screens/user_inside/trusted_contacts.dart';
 import 'package:pryvee/src/screens/user_inside/user_tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
@@ -113,6 +114,8 @@ class _MyApp extends State<MyApp> {
                 case '/UserTabs':
                   return MaterialPageRoute(
                       builder: (_) => UserTabsWidget(currentTab: args));
+                case '/TrustedContacts':
+                  return MaterialPageRoute(builder: (_) => TrustedContacts());
                 default:
                   return MaterialPageRoute(builder: (_) => OnBoardingWidget());
               }
