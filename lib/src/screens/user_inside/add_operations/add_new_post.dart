@@ -1,3 +1,6 @@
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:pryvee/src/providers_utils/post_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/src/screens/user_inside/pick_location_from_map.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunRawChipWidget.dart';
@@ -15,9 +18,10 @@ import 'package:pryvee/data/data_source_set.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pryvee/src/models/post.dart';
 import 'package:pryvee/src/models/user.dart';
-import 'package:pryvee/config/ui_icons.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
+
+import '../../../providers_utils/user_data_provider.dart';
 
 // ignore: must_be_immutable
 class AddNewPosWidget extends StatefulWidget {
@@ -93,25 +97,12 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     print(this.checkDatingUserPicture == null);
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: Icon(
-            UiIcons.return_icon,
-            color: Theme.of(context).hintColor,
-            size: 20.0,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          'Add new post',
-          style: Theme.of(context).textTheme.headline4,
-        ),
-        actions: <Widget>[],
+        title: Text("Add new post"),
       ),
       body: ListView(
         padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -334,8 +325,13 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
               : SizedBox(),
           SizedBox(height: 8.0),
           CommunChipWidget(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => AddNewPosWidget())),
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Container(child: Text("helo"));
+                  });
+            },
             edgeInsetsGeometry:
                 EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
             boxBorder: Border.all(color: APP_COLOR, width: 1.0),
@@ -489,7 +485,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                         markerSet: {},
                         zoom: 16.0,
                       ),
-                      getUserMarkerWidget(),
+                      getUserMarkerWidget(userProvider.userData.picture),
                     ],
                   ),
                 ),
@@ -499,7 +495,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => PickLocationFromMapWidget(
-                        user: this.user,
+                        user: userProvider.userData,
                         refreshTheView: (value) =>
                             setState(() => this.checkDatingLatLng = value)))),
             edgeInsetsGeometry:
@@ -634,34 +630,59 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
           //       )
           //     :
           CommunTextButtonWidget(
-            onPressed: () {
+            onPressed: () async {
+              Post post = Post(
+                  fullName:
+                      "$checkDatingUserFirstname $checkDatingUserLastname",
+                  phoneNumber: checkDatingUserPhoneNumber,
+                  datingAddress: AddressModel(
+                      country: checkDatingCountry,
+                      city: checkDatingCity,
+                      address: checkDatingAddress,
+                      postCode: checkDatingPostcode),
+                  transport: checkTransport,
+                  carPlateNumber: checkCarPlateNumber,
+                  checkInterval: int.parse(checkInterval),
+                  createdAt: DateTime.now().toIso8601String(),
+                  updatedAt: DateTime.now().toIso8601String(),
+                  dateTime: DateTime.now());
+
+              PostOperations.makeNewPost(
+                  userProvider.uid, post, checkDatingUserPicture);
+              // PostOperations.uploadDatingUserPhoto(
+              //     checkDatingUserPicture, userProvider.uid);
+              // Post post = Post(
+              //   pictureUrl: '',
+              //   fullName: checkDatingUserFirstname + checkDatingUserLastname,
+              // );
+
               // apiSet
               //     .uploadImageToCloudinary(this.checkDatingUserPicture, 'dating-users', 'USERID_${this.user.userId}')
               //     .then((CloudinaryResponse cloudinaryResponse) =>
-              apiSet
-                  .addNewPostAPI(
-                AddressModel(
-                  postCode: this.checkDatingPostcode,
-                  address: this.checkDatingAddress,
-                  country: this.checkDatingCountry,
-                  city: this.checkDatingCity,
-                ),
-                this.user.email,
-                this.checkCarPlateNumber,
-                this.checkDatingDate,
-                getIntFromString(this.checkInterval),
-                '2234234',
-                this.checkTransport,
-                UserData(
-                  firstName: this.checkDatingUserFirstname,
-                  lastName: this.checkDatingUserLastname,
-                  phone: this.checkDatingUserPhoneNumber,
-                  picture: 'cloudinaryResponse.public_id',
-                ),
-              )
-                  .then((Post post) {
-                print('a');
-              }).catchError((onError) => this.isLoading = !this.isLoading);
+              // apiSet
+              //     .addNewPostAPI(
+              //   AddressModel(
+              //     postCode: this.checkDatingPostcode,
+              //     address: this.checkDatingAddress,
+              //     country: this.checkDatingCountry,
+              //     city: this.checkDatingCity,
+              //   ),
+              //   this.user.email,
+              //   this.checkCarPlateNumber,
+              //   this.checkDatingDate,
+              //   getIntFromString(this.checkInterval),
+              //   '2234234',
+              //   this.checkTransport,
+              //   UserData(
+              //     firstName: this.checkDatingUserFirstname,
+              //     lastName: this.checkDatingUserLastname,
+              //     phone: this.checkDatingUserPhoneNumber,
+              //     picture: 'cloudinaryResponse.public_id',
+              //   ),
+              // )
+              //     .then((Post post) {
+              //   print('a');
+              // }).catchError((onError) => this.isLoading = !this.isLoading);
               // .catchError((onError) => this.isLoading = !this.isLoading);
             },
             color: APP_COLOR,
@@ -678,7 +699,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
     );
   }
 
-  Widget getUserMarkerWidget() => Stack(
+  Widget getUserMarkerWidget(String picUrl) => Stack(
         alignment: Alignment.center,
         children: [
           CommunChipWidget(
@@ -711,7 +732,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
             child: CircleAvatar(
               backgroundColor: Theme.of(context).focusColor,
               backgroundImage: NetworkImage(
-                this.user.picture,
+                picUrl,
               ),
             ),
           ),

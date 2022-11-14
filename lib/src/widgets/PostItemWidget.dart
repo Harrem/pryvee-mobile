@@ -3,9 +3,12 @@ import 'package:pryvee/src/models/post.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:flutter/material.dart';
 
+import '../models/user.dart';
+
 // ignore: must_be_immutable
 class PostItemWidget extends StatelessWidget {
-  PostItemWidget({Key key, this.post}) : super(key: key);
+  PostItemWidget({Key key, this.post, this.user}) : super(key: key);
+  UserData user;
   Post post;
   @override
   Widget build(BuildContext context) => CommunChipWidget(
@@ -45,7 +48,9 @@ class PostItemWidget extends StatelessWidget {
                     child: CircleAvatar(
                       backgroundColor: Theme.of(context).focusColor,
                       backgroundImage: NetworkImage(
-                        'https://www.shareicon.net/data/512x512/2017/01/06/868320_people_512x512.png',
+                        user != null
+                            ? user.picture ?? DEFAULT_USER_PICTURE
+                            : DEFAULT_USER_PICTURE,
                       ),
                     ),
                   ),
@@ -56,7 +61,7 @@ class PostItemWidget extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'John Doe',
+                          '${user.fullName}',
                           style: Theme.of(context).textTheme.headline2.merge(
                                 TextStyle(
                                   fontSize: 12.0,
@@ -64,7 +69,7 @@ class PostItemWidget extends StatelessWidget {
                               ),
                         ),
                         Text(
-                          'johndoe@pryvee.com',
+                          user.email,
                           style: Theme.of(context).textTheme.caption,
                         ),
                       ],
@@ -90,7 +95,7 @@ class PostItemWidget extends StatelessWidget {
                       SizedBox(width: 4.0),
                       Expanded(
                         child: Text(
-                          'Mr John Smith. 132, My Street, Kingston, New York 12401.',
+                          '${post.datingAddress.address + ", " ?? ""}${post.datingAddress.city + ", " ?? ""}${post.datingAddress.country ?? ""}${", " + post.datingAddress.postCode ?? ""}.',
                           style: Theme.of(context).textTheme.bodyText1,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
@@ -176,7 +181,7 @@ class PostItemWidget extends StatelessWidget {
                           color: Theme.of(context).focusColor,
                           image: DecorationImage(
                             image: NetworkImage(
-                              this.post.datingUser.picture,
+                              this.post.pictureUrl ?? DEFAULT_USER_PICTURE,
                             ),
                           ),
                         ),
@@ -188,7 +193,7 @@ class PostItemWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              this.post.datingUser.fullName,
+                              this.post.fullName,
                               style:
                                   Theme.of(context).textTheme.headline2.merge(
                                         TextStyle(
@@ -197,7 +202,7 @@ class PostItemWidget extends StatelessWidget {
                                       ),
                             ),
                             Text(
-                              this.post.datingUser.phone,
+                              this.post.phoneNumber,
                               style: Theme.of(context).textTheme.caption,
                             ),
                             SizedBox(height: 2.0),
