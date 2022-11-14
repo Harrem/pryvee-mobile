@@ -66,110 +66,113 @@ class _PickLocationFromMapWidget extends State<PickLocationFromMapWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        body: (this.localLocation == null || this.currentMarker == null)
-            ? SizedBox()
-            : Column(
-                children: [
-                  Expanded(
-                    child: GoogleMapWidget(
-                      onCameraMove: (p) => _updateCameraPosition(p),
-                      initialCameraPosition: cameraPosition,
-                      initialLatLng: this.localLocation,
-                      markerSet: {currentMarker},
-                      circleSet: {},
-                      onTap: null,
-                      zoom: 16.0,
-                    ),
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: (this.localLocation == null || this.currentMarker == null)
+          ? SizedBox()
+          : Column(
+              children: [
+                Expanded(
+                  child: GoogleMapWidget(
+                    onCameraMove: (p) => _updateCameraPosition(p),
+                    initialCameraPosition: cameraPosition,
+                    initialLatLng: this.localLocation,
+                    markerSet: {currentMarker},
+                    circleSet: {},
+                    onTap: null,
+                    zoom: 16.0,
                   ),
-                  Container(
-                    padding: EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Center(
-                          child: Container(
-                            height: 4.0,
-                            width: 60.0,
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).focusColor,
-                              borderRadius: BorderRadius.circular(100.0),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8.0),
-                        Row(
-                          children: [
-                            IconButton(
-                              splashRadius: 25.0,
-                              onPressed: () => Navigator.of(context).pop(),
-                              icon: Icon(
-                                Icons.arrow_back,
-                                color: Theme.of(context).colorScheme.secondary,
-                                size: 20.0,
-                              ),
-                            ),
-                            SizedBox(width: 8.0),
-                            Expanded(
-                              child: Text(
-                                "Choisir un empaçement",
-                                style: Theme.of(context).textTheme.headline4,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                          style: Theme.of(context).textTheme.caption,
-                        ),
-                        SizedBox(height: 8.0),
-                        CommunTextButtonWidget(
-                          color: APP_COLOR,
-                          shape: StadiumBorder(),
-                          onPressed: () {
-                            widget.refreshTheView(this.localLocation);
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            "Confirmer",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText1.merge(
-                                  TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
-                          ),
-                        ),
-                        CommunTextButtonWidget(
-                          color: Colors.transparent,
-                          shape: StadiumBorder(
-                              side: BorderSide(color: APP_COLOR, width: 1.0)),
-                          onPressed: () {
-                            getCurrentLocation();
-                            _initState();
-                          },
-                          child: Text(
-                            "Actualiser ma localisation",
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText1.merge(
-                                  TextStyle(
-                                    color: APP_COLOR,
-                                  ),
-                                ),
-                          ),
-                        )
-                      ],
-                    ),
+                ),
+                Container(
+                  padding: EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
-                ],
-              ),
-      );
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Center(
+                        child: Container(
+                          height: 4.0,
+                          width: 60.0,
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).focusColor,
+                            borderRadius: BorderRadius.circular(100.0),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Row(
+                        children: [
+                          IconButton(
+                            splashRadius: 25.0,
+                            onPressed: () => Navigator.of(context).pop(),
+                            icon: Icon(
+                              Icons.arrow_back,
+                              color: Theme.of(context).colorScheme.secondary,
+                              size: 20.0,
+                            ),
+                          ),
+                          SizedBox(width: 8.0),
+                          Expanded(
+                            child: Text(
+                              "Choose a pitch",
+                              style: Theme.of(context).textTheme.headline4,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                        style: Theme.of(context).textTheme.caption,
+                      ),
+                      SizedBox(height: 8.0),
+                      CommunTextButtonWidget(
+                        color: APP_COLOR,
+                        shape: StadiumBorder(),
+                        onPressed: () {
+                          widget.refreshTheView(this.localLocation);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          "To confirm",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyText1.merge(
+                                TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                        ),
+                      ),
+                      CommunTextButtonWidget(
+                        color: Colors.transparent,
+                        shape: StadiumBorder(
+                            side: BorderSide(color: APP_COLOR, width: 1.0)),
+                        onPressed: () {
+                          getCurrentLocation();
+                          _initState();
+                        },
+                        child: Text(
+                          "Update my location",
+                          textAlign: TextAlign.center,
+                          style: Theme.of(context).textTheme.bodyText1.merge(
+                                TextStyle(
+                                  color: APP_COLOR,
+                                ),
+                              ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+
   Widget getUserMarkerWidget() => Stack(
         alignment: Alignment.center,
         children: [
