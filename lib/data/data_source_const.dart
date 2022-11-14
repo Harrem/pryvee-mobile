@@ -9,7 +9,7 @@ const PRYVEE_CLOUDINARY_API_KEY = "853612444811174";
 
 // URLS
 const DEFAULT_USER_PICTURE =
-    'https://firebasestorage.googleapis.com/v0/b/pryvee-b9595.appspot.com/o/defualtProfilePic.png?alt=media&token=13187ec5-abc5-419f-b250-7a509bccd8e4';
+    'https://firebasestorage.googleapis.com/v0/b/pryvee-b9595.appspot.com/o/defaultProfilePic.png?alt=media&token=2f542a74-5bc2-4d75-81fa-58922a2c32ae';
 const CLOUDINARY_IMAGE_BASE_URL =
     "https://res.cloudinary.com/pryvee/image/upload";
 const CLOUDINARY_VIDEO_BASE_URL =
