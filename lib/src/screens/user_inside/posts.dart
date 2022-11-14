@@ -1,4 +1,8 @@
+import 'package:provider/provider.dart';
+import 'package:pryvee/src/providers_utils/post_provider.dart';
+import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/add_operations/add_new_post.dart';
+import 'package:pryvee/src/widgets/PostItemWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
@@ -37,6 +41,7 @@ class _PostsWidgetState extends State<PostsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = Provider.of<UserProvider>(context);
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       children: [
@@ -62,15 +67,6 @@ class _PostsWidgetState extends State<PostsWidget> {
           ),
         ),
         SizedBox(height: 8.0),
-        // ListView.separated(
-        //   separatorBuilder: (context, index) => SizedBox(height: 8.0),
-        //   padding: EdgeInsets.zero,
-        //   shrinkWrap: true,
-        //   itemCount: this.postsList.length,
-        //   itemBuilder: (context, index) {
-        //     return PostItemWidget(post:this.postsList.elementAt(index));
-        //   },
-        // ),
         Row(
           children: [
             Expanded(
@@ -96,15 +92,28 @@ class _PostsWidgetState extends State<PostsWidget> {
           ],
         ),
         SizedBox(height: 12.0),
-        ListView.separated(
-          physics: NeverScrollableScrollPhysics(),
-          separatorBuilder: (context, index) => SizedBox(height: 8.0),
-          padding: EdgeInsets.zero,
-          shrinkWrap: true,
-          itemCount: 7,
-          itemBuilder: (context, index) {
-            return LivePostItemWidget();
-          },
+        FutureBuilder<List<Post>>(
+          future: PostOperations.fetchAllPostes(userProvider.uid),
+          builder: ((context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data != null) {
+                return ListView.separated(
+                  physics: NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) => SizedBox(height: 8.0),
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    return PostItemWidget(
+                      post: snapshot.data[index],
+                      user: userProvider.userData,
+                    );
+                  },
+                );
+              }
+            }
+            return Text("something went wrong");
+          }),
         ),
       ],
     );
