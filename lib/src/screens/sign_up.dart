@@ -41,6 +41,7 @@ class _SignUpWidget extends State<SignUpWidget> {
       extendBodyBehindAppBar: true,
       extendBody: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         elevation: 0,
         automaticallyImplyLeading: false,

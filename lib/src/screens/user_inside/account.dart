@@ -3,6 +3,7 @@ import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_password.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_email.dart';
+import 'package:pryvee/src/screens/user_inside/trusted_contacts.dart';
 import 'package:pryvee/src/widgets/modal_bottom_sheet/add_new_photo_sheet.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
@@ -140,7 +141,7 @@ class _AccountWidgetState extends State<AccountWidget> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: '434',
+                  text: user.contacts.length.toString(),
                   style: Theme.of(context).textTheme.headline2.merge(
                         TextStyle(
                           fontSize: 16.0,
@@ -363,8 +364,7 @@ class _AccountWidgetState extends State<AccountWidget> {
           color: Theme.of(context).focusColor.withOpacity(0.4),
           borderRadiusGeometry: BorderRadius.circular(100.0),
           edgeInsetsGeometry: EdgeInsets.all(16.0),
-          onTap: () =>
-              Navigator.of(context).pushNamed('/UserTabs', arguments: 1),
+          onTap: () => Navigator.of(context).pushNamed('/TrustedContacts'),
           child: Row(
             children: <Widget>[
               Icon(
