@@ -15,21 +15,21 @@ class PostItemWidget extends StatelessWidget {
         color: Theme.of(context).focusColor.withOpacity(0.4),
         borderRadiusGeometry: BorderRadius.circular(8.0),
         edgeInsetsGeometry: EdgeInsets.zero,
-        // gradient: LinearGradient(
-        //   begin: const FractionalOffset(0.0, 0.8),
-        //   end: const FractionalOffset(0.8, 1.0),
-        //   tileMode: TileMode.clamp,
-        //   colors: [
-        //     APP_COLOR,
-        //     Colors.purple,
-        //     Colors.pink,
-        //   ],
-        //   stops: [
-        //     0.0,
-        //     0.8,
-        //     1.0,
-        //   ],
-        // ),
+        gradient: LinearGradient(
+          begin: const FractionalOffset(0.0, 0.8),
+          end: const FractionalOffset(0.8, 1.0),
+          tileMode: TileMode.clamp,
+          colors: [
+            APP_COLOR,
+            Colors.purple,
+            Colors.pink,
+          ],
+          stops: [
+            0.0,
+            0.8,
+            1.0,
+          ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,

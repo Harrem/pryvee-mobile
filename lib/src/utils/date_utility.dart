@@ -9,29 +9,47 @@ import 'package:intl/intl.dart';
 String getYMMMMEEEEd(String value) {
   NavigationService navigationService = locator<NavigationService>();
   BuildContext context = navigationService.navigatorKey.currentContext;
-  return getStringCapitalized(DateFormat.yMMMMEEEEd(Provider.of<LocaleLanguageNotifier>(context).getLocalLocaleLanguage().languageCode).format(DateTime.parse(value)));
+  return getStringCapitalized(DateFormat.yMMMMEEEEd(
+          Provider.of<LocaleLanguageNotifier>(context)
+              .getLocalLocaleLanguage()
+              .languageCode)
+      .format(DateTime.parse(value)));
 }
 
 String getYMEd(String value) {
   NavigationService navigationService = locator<NavigationService>();
   BuildContext context = navigationService.navigatorKey.currentContext;
-  return getStringCapitalized(DateFormat.yMEd(Provider.of<LocaleLanguageNotifier>(context).getLocalLocaleLanguage().languageCode).format(DateTime.parse(value)));
+  return getStringCapitalized(DateFormat.yMEd(
+          Provider.of<LocaleLanguageNotifier>(context)
+              .getLocalLocaleLanguage()
+              .languageCode)
+      .format(DateTime.parse(value)));
 }
 
 String getJm(String value) => DateFormat.jm().format(getDateFromString(value));
 
-DateTime getDateFromString(String value) => DateTime.parse(value);
+DateTime getDateFromString(String value) =>
+    DateTime.fromMicrosecondsSinceEpoch(int.parse(value));
 
 String getEEEE(String date) {
   NavigationService navigationService = locator<NavigationService>();
   BuildContext context = navigationService.navigatorKey.currentContext;
-  return getStringCapitalized(DateFormat.EEEE(Provider.of<LocaleLanguageNotifier>(context).getLocalLocaleLanguage().languageCode).format(getDateFromString(date)));
+  return getStringCapitalized(DateFormat.EEEE(
+          Provider.of<LocaleLanguageNotifier>(context)
+              .getLocalLocaleLanguage()
+              .languageCode)
+      .format(getDateFromString(date)));
 }
 
 String getMMM(String date) {
   NavigationService navigationService = locator<NavigationService>();
   BuildContext context = navigationService.navigatorKey.currentContext;
-  return getStringCapitalized(DateFormat.MMM(Provider.of<LocaleLanguageNotifier>(context).getLocalLocaleLanguage().languageCode).format(getDateFromString(date)));
+  return getStringCapitalized(DateFormat.MMM(
+          Provider.of<LocaleLanguageNotifier>(context)
+              .getLocalLocaleLanguage()
+              .languageCode)
+      .format(getDateFromString(date)));
 }
 
-bool isCurrrentDay(String value) => value.toLowerCase() == getEEEE(DateTime.now().toString()).toLowerCase();
+bool isCurrrentDay(String value) =>
+    value.toLowerCase() == getEEEE(DateTime.now().toString()).toLowerCase();

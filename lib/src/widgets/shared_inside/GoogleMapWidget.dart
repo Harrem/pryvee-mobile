@@ -38,29 +38,34 @@ class _GoogleMapWidget extends State<GoogleMapWidget> {
 
   @override
   void dispose() {
-    this.googleMapController.complete();
     super.dispose();
+    // this.googleMapController.complete();
   }
 
   @override
   void initState() {
     super.initState();
     if (mounted) {
-       rootBundle.loadString('map-style/dark_theme_map_style.json').then((value) => setState(() => this.darkThemeMapStyle = value));
-      rootBundle.loadString('map-style/light_theme_map_style.json').then((value) => setState(() => this.lightThemeMapStyle = value));
+      rootBundle
+          .loadString('map-style/dark_theme_map_style.json')
+          .then((value) => setState(() => this.darkThemeMapStyle = value));
+      rootBundle
+          .loadString('map-style/light_theme_map_style.json')
+          .then((value) => setState(() => this.lightThemeMapStyle = value));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ThemeData localTheme = Provider.of<ThemeNotifier>(context, listen: false).getLocalTheme();
+    ThemeData localTheme =
+        Provider.of<ThemeNotifier>(context, listen: false).getLocalTheme();
     return (this.lightThemeMapStyle == null)
         ? SizedBox()
         : GoogleMap(
             initialCameraPosition: widget.initialCameraPosition,
-            onCameraMove: widget.onCameraMove, 
+            onCameraMove: widget.onCameraMove,
             myLocationButtonEnabled: false,
-            rotateGesturesEnabled:  true,
+            rotateGesturesEnabled: true,
             scrollGesturesEnabled: true,
             zoomControlsEnabled: false,
             zoomGesturesEnabled: true,
@@ -74,7 +79,10 @@ class _GoogleMapWidget extends State<GoogleMapWidget> {
             onTap: widget.onTap,
             onMapCreated: (GoogleMapController controller) {
               this.googleMapController.complete(controller);
-              this.googleMapController.future.then((value) => value.setMapStyle((localTheme == darkTheme) ? this.darkThemeMapStyle : this.lightThemeMapStyle));
+              this.googleMapController.future.then((value) => value.setMapStyle(
+                  (localTheme == darkTheme)
+                      ? this.darkThemeMapStyle
+                      : this.lightThemeMapStyle));
               setState(() {});
             },
           );
