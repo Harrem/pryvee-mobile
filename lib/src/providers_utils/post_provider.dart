@@ -57,4 +57,23 @@ class PostOperations {
 
     return url;
   }
+
+  static Future<void> deletePost(Post post, uid) async {
+    await FirebaseFirestore.instance
+        .collection('tempPostKeeper')
+        .doc(uid)
+        .collection('posts')
+        .doc(post.pid)
+        .set(post.toMap())
+        .then((value) async {
+      await FirebaseFirestore.instance
+          .collection('posts')
+          .doc(uid)
+          .collection('posts')
+          .doc(post.pid)
+          .delete()
+          .then((value) => debugPrint("Post Deleted Successfully!"))
+          .catchError((e) => debugPrint("Error: $e"));
+    });
+  }
 }
