@@ -7,19 +7,25 @@ import 'package:pryvee/src/utils/commun_mix_utility.dart';
 import 'package:pryvee/src/utils/date_utility.dart';
 
 class Post {
+  int notificationId;
+  String pid;
+  bool isLive;
   AddressModel datingAddress;
   String currentUserEmail;
   String trustedUserEmail;
   String carPlateNumber;
   DateTime dateTime;
   int checkInterval;
-  String updatedAt;
-  String createdAt;
+  int updatedAt;
+  int createdAt;
   String transport;
   String fullName;
   String phoneNumber;
   String pictureUrl;
   Post({
+    this.notificationId,
+    this.pid,
+    this.isLive,
     this.currentUserEmail,
     this.trustedUserEmail,
     this.carPlateNumber,
@@ -35,6 +41,9 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
+        notificationId: (json['id'] == null) ? 0 : json['id'] as int,
+        pid: (json['pid'] == null) ? "" : json['pid'].toString(),
+        isLive: (json['id'] == null) ? false : json['isLive'] as bool,
         checkInterval:
             (json['checkInterval'] == null) ? 0 : json['checkInterval'] as int,
         datingAddress: (json['datingAddress'] == null)
@@ -52,10 +61,8 @@ class Post {
         carPlateNumber: (json['carPlateNumber'] == null)
             ? ''
             : json['carPlateNumber'].toString(),
-        updatedAt:
-            (json['updatedAt'] == null) ? '' : json['updatedAt'].toString(),
-        createdAt:
-            (json['createdAt'] == null) ? '' : json['createdAt'].toString(),
+        updatedAt: (json['updatedAt'] == null) ? 0 : json['updatedAt'] as int,
+        createdAt: (json['createdAt'] == null) ? 0 : json['createdAt'] as int,
         transport:
             (json['transport'] == null) ? '' : json['transport'].toString(),
         fullName: (json['fullName'] == null) ? '' : json['fullName'].toString(),
@@ -67,6 +74,9 @@ class Post {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
+      'id': notificationId,
+      'pid': pid,
+      'isLive': isLive,
       'datingAddress': datingAddress.toMap(),
       'currentUserEmail': currentUserEmail,
       'trustedUserEmail': trustedUserEmail,
@@ -84,6 +94,9 @@ class Post {
 
   factory Post.fromMap(Map<String, dynamic> map) {
     return Post(
+      notificationId: map['id'] as int,
+      pid: map['pid'].toString(),
+      isLive: map['isLive'] as bool,
       datingAddress:
           AddressModel.fromMap(map['datingAddress'] as Map<String, dynamic>),
       currentUserEmail: map['currentUserEmail'] as String,
@@ -91,8 +104,8 @@ class Post {
       carPlateNumber: map['carPlateNumber'] as String,
       dateTime: DateTime.fromMillisecondsSinceEpoch(map['dateTime'] as int),
       checkInterval: map['checkInterval'] as int,
-      updatedAt: map['updatedAt'] as String,
-      createdAt: map['createdAt'] as String,
+      updatedAt: map['updatedAt'] as int,
+      createdAt: map['createdAt'] as int,
       transport: map['transport'] as String,
       fullName: map['fullName'] as String,
       phoneNumber: map['phoneNumber'] as String,
