@@ -1,4 +1,6 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
@@ -20,6 +22,53 @@ class OnBoardingWidget extends StatefulWidget {
 class _OnBoardingWidget extends State<OnBoardingWidget> {
   OnBoardingList _onBoardingList = OnBoardingList();
   int _current = 0;
+
+  @override
+  void initState() {
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        // This is just a basic example. For real apps, you must show some
+        // friendly dialog box before call the request method.
+        // This is very important to not harm the user experience
+        // _askPermissions("");
+        showDialog(
+            context: context,
+            builder: (context) {
+              return Scaffold(
+                backgroundColor: Colors.transparent,
+                body: Center(
+                  child: Container(
+                      width: 300,
+                      height: 400,
+                      child: Card(
+                        child: Column(
+                          children: [
+                            Text("this app needs notification permission"),
+                            ElevatedButton(
+                                onPressed: () {
+                                  AwesomeNotifications()
+                                      .requestPermissionToSendNotifications()
+                                      .then((value) {
+                                    Navigator.pop(context);
+                                  });
+                                },
+                                child: Text("Allow")),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text("Deny"),
+                            ),
+                          ],
+                        ),
+                      )),
+                ),
+              );
+            });
+      }
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
