@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/app_delegate_locale.dart/app_localization.dart';
@@ -30,6 +31,28 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   setupLocator();
 
+  AwesomeNotifications().initialize(
+      // set the icon to null if you want to use the default app icon
+      null,
+      [
+        NotificationChannel(
+            channelGroupKey: 'main_channel_group',
+            channelKey: 'main_channel',
+            channelName: 'important notifications',
+            channelDescription: 'Notification channel for basic tests',
+            defaultColor: Color(0xFF9D50DD),
+            ledColor: Colors.red,
+            importance: NotificationImportance.High),
+      ],
+      // Channel groups are only visual and are not required
+      channelGroups: [
+        NotificationChannelGroup(
+          channelGroupKey: 'basic_channel_group',
+          channelGroupName: 'Basic group',
+        )
+      ],
+      debug: true);
+
   Rx.forkJoinList([SharedPreferences.getInstance().asStream()])
       .listen((List<dynamic> value) {
     String localLocaleLanguage = value.first.getString('localLocaleLanguage');
@@ -50,11 +73,11 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   @override
+  static final navigatorKey = GlobalKey<NavigatorState>();
   _MyApp createState() => _MyApp();
 }
 
 class _MyApp extends State<MyApp> {
-  final navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription<User> _sub;
 
   @override
@@ -115,6 +138,8 @@ class _MyApp extends State<MyApp> {
                   return MaterialPageRoute(
                       builder: (_) => UserTabsWidget(currentTab: args));
                 case '/TrustedContacts':
+                  return MaterialPageRoute(builder: (_) => TrustedContacts());
+                case '/notification-page':
                   return MaterialPageRoute(builder: (_) => TrustedContacts());
                 default:
                   return MaterialPageRoute(builder: (_) => OnBoardingWidget());
