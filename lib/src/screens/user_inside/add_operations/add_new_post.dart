@@ -1,3 +1,6 @@
+import 'dart:math';
+
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/providers_utils/post_provider.dart';
@@ -632,6 +635,8 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
           CommunTextButtonWidget(
             onPressed: () async {
               Post post = Post(
+                  notificationId: Random().nextInt(1000000),
+                  isLive: true,
                   fullName:
                       "$checkDatingUserFirstname $checkDatingUserLastname",
                   phoneNumber: checkDatingUserPhoneNumber,
@@ -643,12 +648,37 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                   transport: checkTransport,
                   carPlateNumber: checkCarPlateNumber,
                   checkInterval: int.parse(checkInterval),
-                  createdAt: DateTime.now().toIso8601String(),
-                  updatedAt: DateTime.now().toIso8601String(),
+                  createdAt: DateTime.now().millisecondsSinceEpoch,
+                  updatedAt: DateTime.now().millisecondsSinceEpoch,
                   dateTime: DateTime.now());
-
+              debugPrint("${post.notificationId} ${post.checkInterval}");
               PostOperations.makeNewPost(
-                  userProvider.uid, post, checkDatingUserPicture);
+                      userProvider.uid, post, checkDatingUserPicture)
+                  .then((value) {
+                AwesomeNotifications().createNotification(
+                  content: NotificationContent(
+                    id: post.notificationId,
+                    channelKey: 'main_channel',
+                    title: "Are you safe?",
+                    body: "please choose if you're safe or not",
+                  ),
+                  schedule: NotificationCalendar(minute: 1, repeats: true),
+                  actionButtons: [
+                    NotificationActionButton(
+                        key: 'safe',
+                        label: "I'm safe",
+                        actionType: ActionType.DismissAction),
+                    NotificationActionButton(
+                        key: 'danger',
+                        label: "I'm in danger",
+                        actionType: ActionType.Default),
+                  ],
+                );
+                showToast(context, "Post Created!");
+                Navigator.pop(context);
+              }).catchError((e) {
+                showToast(context, e);
+              });
               // PostOperations.uploadDatingUserPhoto(
               //     checkDatingUserPicture, userProvider.uid);
               // Post post = Post(
