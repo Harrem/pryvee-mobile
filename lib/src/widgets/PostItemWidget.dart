@@ -181,7 +181,9 @@ class PostItemWidget extends StatelessWidget {
                           color: Theme.of(context).focusColor,
                           image: DecorationImage(
                             image: NetworkImage(
-                              this.post.pictureUrl ?? DEFAULT_USER_PICTURE,
+                              post.pictureUrl.isNotEmpty
+                                  ? post.pictureUrl
+                                  : DEFAULT_USER_PICTURE,
                             ),
                           ),
                         ),
