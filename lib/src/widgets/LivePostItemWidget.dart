@@ -1,11 +1,21 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:pryvee/data/data_source_const.dart';
+import 'package:pryvee/src/models/post.dart';
+import 'package:pryvee/src/models/user.dart';
+import 'package:pryvee/src/providers_utils/post_provider.dart';
+import 'package:pryvee/src/utils/commun_mix_utility.dart';
+import 'package:pryvee/src/utils/contact_operations.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class LivePostItemWidget extends StatelessWidget {
-  LivePostItemWidget({Key key}) : super(key: key);
-
+  LivePostItemWidget({Key key, @required this.post, @required this.userData})
+      : super(key: key);
+  Post post;
+  UserData userData;
   @override
   Widget build(BuildContext context) => CommunChipWidget(
         color: Theme.of(context).focusColor.withOpacity(0.4),
@@ -31,7 +41,9 @@ class LivePostItemWidget extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             CommunChipWidget(
-              borderRadiusGeometry: BorderRadius.only(topLeft: Radius.circular(8.0), topRight: Radius.circular(8.0)),
+              borderRadiusGeometry: BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  topRight: Radius.circular(8.0)),
               edgeInsetsGeometry: EdgeInsets.all(10.0),
               color: Theme.of(context).focusColor,
               child: Row(
@@ -42,7 +54,7 @@ class LivePostItemWidget extends StatelessWidget {
                     child: CircleAvatar(
                       backgroundColor: Theme.of(context).focusColor,
                       backgroundImage: NetworkImage(
-                        'https://www.shareicon.net/data/512x512/2017/01/06/868320_people_512x512.png',
+                        userData.picture ?? DEFAULT_USER_PICTURE,
                       ),
                     ),
                   ),
@@ -53,7 +65,7 @@ class LivePostItemWidget extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'John Doe',
+                          userData.fullName,
                           style: Theme.of(context).textTheme.headline2.merge(
                                 TextStyle(
                                   fontSize: 12.0,
@@ -61,7 +73,7 @@ class LivePostItemWidget extends StatelessWidget {
                               ),
                         ),
                         Text(
-                          'johndoe@pryvee.com',
+                          userData.email,
                           style: Theme.of(context).textTheme.caption,
                         ),
                       ],
@@ -69,7 +81,7 @@ class LivePostItemWidget extends StatelessWidget {
                   ),
                   SizedBox(width: 8.0),
                   Text(
-                    '06:00 AM',
+                    "${DateFormat(DateFormat.HOUR24_MINUTE).format(DateTime.fromMillisecondsSinceEpoch(post.createdAt))}",
                     style: Theme.of(context).textTheme.headline1,
                   ),
                 ],
@@ -100,7 +112,8 @@ class LivePostItemWidget extends StatelessWidget {
                         ),
                       ),
                       CommunChipWidget(
-                        edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
+                        edgeInsetsGeometry: EdgeInsets.symmetric(
+                            vertical: 4.0, horizontal: 10.0),
                         borderRadiusGeometry: BorderRadius.circular(100.0),
                         color: Colors.black,
                         child: Text(
@@ -147,7 +160,7 @@ class LivePostItemWidget extends StatelessWidget {
                       SizedBox(width: 4.0),
                       Expanded(
                         child: Text(
-                          'Using Uber ( TAXI )',
+                          'Using ${post.transport}}',
                           style: Theme.of(context).textTheme.bodyText1,
                           overflow: TextOverflow.ellipsis,
                           softWrap: false,
@@ -155,6 +168,33 @@ class LivePostItemWidget extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ),
+                  GestureDetector(
+                    onDoubleTap: () async {
+                      await Clipboard.setData(
+                              ClipboardData(text: post.carPlateNumber))
+                          .then((value) =>
+                              showToast(context, "Copied to Clipboard!"));
+                    },
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.numbers,
+                          color: Colors.grey,
+                          size: 20.0,
+                        ),
+                        SizedBox(width: 4.0),
+                        Expanded(
+                          child: Text(
+                            'Plate No: ${post.carPlateNumber}',
+                            style: Theme.of(context).textTheme.bodyText1,
+                            overflow: TextOverflow.ellipsis,
+                            softWrap: false,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 8.0),
                   Text(
@@ -177,7 +217,9 @@ class LivePostItemWidget extends StatelessWidget {
                           color: Theme.of(context).focusColor,
                           image: DecorationImage(
                             image: NetworkImage(
-                              'https://cdn2.iconfinder.com/data/icons/avatar-2/512/iri_girl_face-512.png',
+                              post.pictureUrl.isNotEmpty
+                                  ? post.pictureUrl
+                                  : DEFAULT_USER_PICTURE,
                             ),
                           ),
                         ),
@@ -189,15 +231,16 @@ class LivePostItemWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'May Clarck',
-                              style: Theme.of(context).textTheme.headline2.merge(
-                                    TextStyle(
-                                      fontSize: 12.0,
-                                    ),
-                                  ),
+                              '${post.fullName}',
+                              style:
+                                  Theme.of(context).textTheme.headline2.merge(
+                                        TextStyle(
+                                          fontSize: 12.0,
+                                        ),
+                                      ),
                             ),
                             Text(
-                              'johndoe@pryvee.com',
+                              "Phone No: ${post.phoneNumber}",
                               style: Theme.of(context).textTheme.caption,
                             ),
                             SizedBox(height: 2.0),
@@ -205,54 +248,54 @@ class LivePostItemWidget extends StatelessWidget {
                               spacing: 4.0,
                               runSpacing: 4.0,
                               children: [
-                                CommunChipWidget(
-                                  edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
-                                  borderRadiusGeometry: BorderRadius.circular(100.0),
-                                  color: Colors.transparent,
-                                  boxBorder: Border.all(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1.0,
-                                  ),
-                                  child: Text(
-                                    'Call May',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context).textTheme.bodyText1.merge(
-                                          TextStyle(
-                                            fontSize: 10.0,
+                                GestureDetector(
+                                  onTap: () {
+                                    ContactOperations.dail(post.phoneNumber);
+                                  },
+                                  child: CommunChipWidget(
+                                    edgeInsetsGeometry: EdgeInsets.symmetric(
+                                        vertical: 4.0, horizontal: 10.0),
+                                    borderRadiusGeometry:
+                                        BorderRadius.circular(100.0),
+                                    color: Colors.transparent,
+                                    boxBorder: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                      width: 1.0,
+                                    ),
+                                    child: Text(
+                                      'Call ${post.fullName.split(' ')[0]}',
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyText1
+                                          .merge(
+                                            TextStyle(
+                                              fontSize: 10.0,
+                                            ),
                                           ),
-                                        ),
+                                    ),
                                   ),
                                 ),
                                 CommunChipWidget(
-                                  edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
-                                  borderRadiusGeometry: BorderRadius.circular(100.0),
+                                  edgeInsetsGeometry: EdgeInsets.symmetric(
+                                      vertical: 4.0, horizontal: 10.0),
+                                  borderRadiusGeometry:
+                                      BorderRadius.circular(100.0),
                                   color: Colors.transparent,
                                   boxBorder: Border.all(
-                                    color: Theme.of(context).colorScheme.secondary,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
                                     width: 1.0,
                                   ),
                                   child: Text(
-                                    'Report May',
+                                    'Report ${post.fullName.split(' ')[0]}',
                                     textAlign: TextAlign.center,
-                                    style: Theme.of(context).textTheme.bodyText1.merge(
-                                          TextStyle(
-                                            fontSize: 10.0,
-                                          ),
-                                        ),
-                                  ),
-                                ),
-                                CommunChipWidget(
-                                  edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
-                                  borderRadiusGeometry: BorderRadius.circular(100.0),
-                                  color: Colors.transparent,
-                                  boxBorder: Border.all(
-                                    color: Theme.of(context).colorScheme.secondary,
-                                    width: 1.0,
-                                  ),
-                                  child: Text(
-                                    'Share profile',
-                                    textAlign: TextAlign.center,
-                                    style: Theme.of(context).textTheme.bodyText1.merge(
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1
+                                        .merge(
                                           TextStyle(
                                             fontSize: 10.0,
                                           ),
@@ -270,36 +313,53 @@ class LivePostItemWidget extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: CommunChipWidget(
-                          edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-                          borderRadiusGeometry: BorderRadius.circular(8.0),
-                          color: APP_COLOR,
-                          child: Text(
-                            'In danger!'.toUpperCase(),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText1.merge(
-                                  TextStyle(
-                                    color: Colors.white,
-                                  ),
-                                ),
+                        child: GestureDetector(
+                          child: CommunChipWidget(
+                            edgeInsetsGeometry: EdgeInsets.symmetric(
+                                vertical: 6.0, horizontal: 12.0),
+                            borderRadiusGeometry: BorderRadius.circular(8.0),
+                            color: APP_COLOR,
+                            child: Text(
+                              'In danger!'.toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style:
+                                  Theme.of(context).textTheme.bodyText1.merge(
+                                        TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                            ),
                           ),
                         ),
                       ),
                       SizedBox(width: 4.0),
                       Expanded(
-                        child: CommunChipWidget(
-                          edgeInsetsGeometry: EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
-                          boxBorder: Border.all(color: APP_COLOR, width: 1.0),
-                          borderRadiusGeometry: BorderRadius.circular(8.0),
-                          color: Colors.transparent,
-                          child: Text(
-                            "I'am safe".toUpperCase(),
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.bodyText1.merge(
-                                  TextStyle(
-                                    color: APP_COLOR,
-                                  ),
-                                ),
+                        child: GestureDetector(
+                          onTap: () {
+                            PostOperations.deletePost(post, userData.uid)
+                                .then((value) {
+                              AwesomeNotifications()
+                                  .cancel(post.notificationId);
+                              showToast(context, "Post Removed");
+                            }).catchError(
+                                    (e) => showToast(context, "Error: $e"));
+                          },
+                          child: CommunChipWidget(
+                            edgeInsetsGeometry: EdgeInsets.symmetric(
+                                vertical: 6.0, horizontal: 12.0),
+                            boxBorder: Border.all(color: APP_COLOR, width: 1.0),
+                            borderRadiusGeometry: BorderRadius.circular(8.0),
+                            color: Colors.transparent,
+                            child: Text(
+                              "I'am safe".toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style:
+                                  Theme.of(context).textTheme.bodyText1.merge(
+                                        TextStyle(
+                                          color: APP_COLOR,
+                                        ),
+                                      ),
+                            ),
                           ),
                         ),
                       ),
