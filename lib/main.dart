@@ -2,15 +2,20 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/app_delegate_locale.dart/app_localization.dart';
+import 'package:pryvee/src/controllers/notification_controller.dart';
 import 'package:pryvee/src/providers_utils/auth_provider.dart';
 import 'package:pryvee/src/providers_utils/locale_language_notifier.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:pryvee/src/providers_utils/post_provider.dart';
 import 'package:pryvee/src/providers_utils/session_notifier.dart';
 import 'package:pryvee/src/providers_utils/theme_notifier.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/forgot_password.dart';
+import 'package:pryvee/src/screens/user_inside/sos.dart';
 import 'package:pryvee/src/screens/user_inside/trusted_contacts.dart';
 import 'package:pryvee/src/screens/user_inside/user_tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,24 +36,25 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   setupLocator();
 
-  AwesomeNotifications().initialize(
+  await AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
       null,
       [
         NotificationChannel(
-            channelGroupKey: 'main_channel_group',
-            channelKey: 'main_channel',
-            channelName: 'important notifications',
-            channelDescription: 'Notification channel for basic tests',
-            defaultColor: Color(0xFF9D50DD),
-            ledColor: Colors.red,
-            importance: NotificationImportance.High),
+          channelGroupKey: 'basic_channel_group',
+          channelKey: 'basic_channel',
+          channelName: 'scheduled notifications',
+          channelDescription: 'Notification channel for tests',
+          defaultColor: Color(0xFF9D50DD),
+          ledColor: APP_COLOR,
+          importance: NotificationImportance.Max,
+        ),
       ],
       // Channel groups are only visual and are not required
       channelGroups: [
         NotificationChannelGroup(
-          channelGroupKey: 'basic_channel_group',
-          channelGroupName: 'Basic group',
+          channelGroupkey: 'basic_channel_group',
+          channelGroupName: 'basic group',
         )
       ],
       debug: true);
@@ -91,7 +97,12 @@ class _MyApp extends State<MyApp> {
     if (this.mounted) {
       addLocalLocationToSP("36.8089092" + "_" + "10.1363789");
     }
-
+    AwesomeNotifications().actionStream.listen((receivedAction) {
+      debugPrint(receivedAction.toString() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      if (receivedAction.channelKey == 'basic_channel') {
+        NotificationController.onActionReceivedMethod(receivedAction);
+      }
+    });
     // _sub = FirebaseAuth.instance.authStateChanges().listen((user) async {
     //   if (user != null) {
     //       navigatorKey.currentState.pushReplacementNamed(RouteGenerator.home);
@@ -105,46 +116,54 @@ class _MyApp extends State<MyApp> {
   Widget build(BuildContext context) => MultiProvider(
         providers: [
           ChangeNotifierProvider<UserProvider>(
-              create: (context) => UserProvider())
+              create: (context) => UserProvider()),
+          ChangeNotifierProvider<PostProvider>(
+              create: (context) => PostProvider())
         ],
         child: Consumer2<ThemeNotifier, SessionNotifier>(
-          builder: (context, themeNotifier, sessionNotifier, _) => MaterialApp(
-            localizationsDelegates: [
-              GlobalCupertinoLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              AppLocalizations.delegate,
-            ],
-            locale: Provider.of<LocaleLanguageNotifier>(context, listen: false)
-                .getLocalLocaleLanguage(),
-            supportedLocales: [Locale('en', 'US'), Locale('fr', 'FR')],
-            navigatorKey: locator<NavigationService>().navigatorKey,
-            theme: themeNotifier.getLocalTheme(),
-            debugShowCheckedModeBanner: false,
-            title: 'Pryvee',
-            onGenerateRoute: (RouteSettings routeSettings) {
-              Object args = routeSettings.arguments;
-              switch (routeSettings.name) {
-                case '/':
-                  return MaterialPageRoute(builder: (_) => OnBoardingWidget());
-                case '/SignIn':
-                  return MaterialPageRoute(builder: (_) => SignInWidget());
-                case '/SignUp':
-                  return MaterialPageRoute(builder: (_) => SignUpWidget());
-                case '/ForgotPassword':
-                  return MaterialPageRoute(
-                      builder: (_) => ForgotPasswordWidget());
-                case '/UserTabs':
-                  return MaterialPageRoute(
-                      builder: (_) => UserTabsWidget(currentTab: args));
-                case '/TrustedContacts':
-                  return MaterialPageRoute(builder: (_) => TrustedContacts());
-                case '/notification-page':
-                  return MaterialPageRoute(builder: (_) => TrustedContacts());
-                default:
-                  return MaterialPageRoute(builder: (_) => OnBoardingWidget());
-              }
-            },
+          builder: (context, themeNotifier, sessionNotifier, _) =>
+              ScreenUtilInit(
+            builder: (context, child) => MaterialApp(
+              localizationsDelegates: [
+                GlobalCupertinoLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                AppLocalizations.delegate,
+              ],
+              locale:
+                  Provider.of<LocaleLanguageNotifier>(context, listen: false)
+                      .getLocalLocaleLanguage(),
+              supportedLocales: [Locale('en', 'US'), Locale('fr', 'FR')],
+              navigatorKey: MyApp.navigatorKey,
+              theme: themeNotifier.getLocalTheme(),
+              debugShowCheckedModeBanner: false,
+              title: 'Pryvee',
+              onGenerateRoute: (RouteSettings routeSettings) {
+                Object args = routeSettings.arguments;
+                switch (routeSettings.name) {
+                  case '/':
+                    return MaterialPageRoute(
+                        builder: (_) => OnBoardingWidget());
+                  case '/SignIn':
+                    return MaterialPageRoute(builder: (_) => SignInWidget());
+                  case '/SignUp':
+                    return MaterialPageRoute(builder: (_) => SignUpWidget());
+                  case '/ForgotPassword':
+                    return MaterialPageRoute(
+                        builder: (_) => ForgotPasswordWidget());
+                  case '/UserTabs':
+                    return MaterialPageRoute(
+                        builder: (_) => UserTabsWidget(currentTab: args));
+                  case '/TrustedContacts':
+                    return MaterialPageRoute(builder: (_) => TrustedContacts());
+                  case '/notification-page':
+                    return MaterialPageRoute(builder: (_) => SOSPage());
+                  default:
+                    return MaterialPageRoute(
+                        builder: (_) => OnBoardingWidget());
+                }
+              },
+            ),
           ),
         ),
       );
