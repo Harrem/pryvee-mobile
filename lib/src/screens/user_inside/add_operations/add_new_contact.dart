@@ -1,7 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:pryvee/src/models/user.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
 
@@ -89,41 +91,71 @@ class _AddNewContactWidgetState extends State<AddNewContactWidget> {
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : ListView.separated(
-                    separatorBuilder: (context, index) => Divider(),
-                    itemCount: contacts.length,
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Icon(Icons.person),
-                        title: Text(contacts[index].displayName),
-                        trailing: IconButton(
-                          onPressed: () async {
-                            if (!userProvider.userData.contacts
-                                .contains(contacts[index])) {
-                              userProvider.userData.contacts
-                                  .add(contacts[index]);
-                              debugPrint(userProvider.userData.contacts.length
-                                  .toString());
-                              await userProvider
-                                  .uploadUserData()
-                                  .then((value) => showToast(
-                                      context, "Added to trusted contacts"))
-                                  .catchError((e) => showToast(
-                                      context, "error while adding contact!"));
-                            } else {
-                              showToast(context, "Already Added");
-                            }
-                          },
-                          icon: Icon(Icons.add_circle, color: Colors.red),
-                        ),
-                      );
+                : FutureBuilder<List<UserData>>(
+                    future: getAvaliableUsers(contacts),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return ListView.separated(
+                            separatorBuilder: (context, index) => Divider(),
+                            itemCount: snapshot.data.length,
+                            padding: EdgeInsets.zero,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                leading: Icon(Icons.person),
+                                title: Text(snapshot.data[index].fullName),
+                                trailing: IconButton(
+                                  onPressed: () async {
+                                    if (!userProvider.userData.contacts
+                                        .contains(contacts[index])) {
+                                      userProvider.userData.contacts
+                                          .add(snapshot.data[index]);
+                                      debugPrint(userProvider
+                                          .userData.contacts.first
+                                          .toString());
+                                      await userProvider
+                                          .uploadUserData()
+                                          .then((value) => showToast(context,
+                                              "Added to trusted contacts"))
+                                          .catchError((e) => showToast(context,
+                                              "error while adding contact!"));
+                                    } else {
+                                      showToast(context, "Already Added");
+                                    }
+                                  },
+                                  icon:
+                                      Icon(Icons.add_circle, color: Colors.red),
+                                ),
+                              );
+                            });
+                      }
+                      return Text("Loading Data");
                     },
                   ),
           ),
         ]),
       ),
     );
+  }
+
+  Future<List<UserData>> getAvaliableUsers(List<Contact> contacts) async {
+    List<UserData> list = [];
+
+    var docs = await FirebaseFirestore.instance
+        .collection('users')
+        .get()
+        .then((value) => value.docs);
+
+    contacts.forEach((contact) {
+      if (contact.phones.isNotEmpty) {
+        var phoneNo = contact.phones.first.value;
+        docs.forEach((element) {
+          if (element.data()['phone'] == phoneNo) {
+            list.add(UserData.fromJson(element.data()));
+          }
+        });
+      }
+    });
+    return list;
   }
 }

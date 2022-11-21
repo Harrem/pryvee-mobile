@@ -41,6 +41,7 @@ class _PostsWidgetState extends State<PostsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -92,29 +93,17 @@ class _PostsWidgetState extends State<PostsWidget> {
           ],
         ),
         SizedBox(height: 12.0),
-        FutureBuilder<List<Post>>(
-          future: PostOperations.fetchAllPostes(userProvider.uid),
-          builder: ((context, snapshot) {
-            if (snapshot.hasData) {
-              if (snapshot.data != null) {
-                return ListView.separated(
-                  physics: NeverScrollableScrollPhysics(),
-                  separatorBuilder: (context, index) => SizedBox(height: 8.0),
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  itemCount: snapshot.data.length,
-                  itemBuilder: (context, index) {
-                    return PostItemWidget(
-                      post: snapshot.data[index],
-                      user: userProvider.userData,
-                    );
-                  },
-                );
-              }
-            }
-            return Text("something went wrong");
-          }),
-        ),
+        ListView.separated(
+          physics: NeverScrollableScrollPhysics(),
+          separatorBuilder: (context, index) => SizedBox(height: 8.0),
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          itemCount: postProvider.posts.length,
+          itemBuilder: (context, index) {
+            return PostItemWidget(
+                post: postProvider.posts[index], user: userProvider.userData);
+          },
+        )
       ],
     );
   }

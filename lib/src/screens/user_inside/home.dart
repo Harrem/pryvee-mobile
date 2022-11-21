@@ -1,14 +1,13 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:pryvee/src/controllers/notification_controller.dart';
 import 'package:pryvee/src/models/post.dart';
 import 'package:pryvee/src/providers_utils/post_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
-import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
 import 'package:pryvee/src/widgets/LivePostItemWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_get.dart';
 import 'package:flutter/material.dart';
-
 import 'add_operations/add_new_post.dart';
 
 class HomeWidget extends StatefulWidget {
@@ -18,34 +17,28 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   TextEditingController searchTextEditingController = TextEditingController();
-
+  List<Post> posts;
   DataSourceGet apiGet = DataSourceGet();
-  bool _firstSearch = true;
-  String _query = "";
+  String localTimeZone;
 
-  _HomeWidgetState() {
-    this.searchTextEditingController.addListener(() {
-      if (this.searchTextEditingController.text.isEmpty) {
-        setState(() {
-          this._firstSearch = true;
-          this._query = "";
-        });
-      } else {
-        setState(() {
-          this._firstSearch = false;
-          this._query = this.searchTextEditingController.text;
-        });
-      }
-    });
+  Future<void> getLocalTimeZone() async {
+    localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
   }
+
   @override
   void initState() {
+    getLocalTimeZone();
+    AwesomeNotifications().listScheduledNotifications().then((value) {
+      debugPrint("Active Notifications: " + value.length.toString());
+      debugPrint("scheduled Notifications: " + value.toString());
+    });
     super.initState();
     if (mounted) {}
   }
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
@@ -114,36 +107,21 @@ class _HomeWidgetState extends State<HomeWidget> {
           ],
         ),
         SizedBox(height: 12.0),
-        FutureBuilder<List<Post>>(
-          future: PostOperations.fetchAllPostes(userProvider.uid),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(
-                child: const CircularProgressIndicator(),
-              );
-            }
-            if (snapshot.hasData && snapshot.data.isNotEmpty) {
-              List<Post> posts = [];
-              snapshot.data.forEach((post) {
-                if (post.isLive) {
-                  posts.add(post);
-                }
-              });
-              return ListView.separated(
+        postProvider.posts != null
+            ? ListView.separated(
                 physics: NeverScrollableScrollPhysics(),
                 separatorBuilder: (context, index) => SizedBox(height: 8.0),
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
-                itemCount: posts.length,
+                itemCount: postProvider.getLivePosts().length,
                 itemBuilder: (context, index) {
                   return LivePostItemWidget(
-                    post: posts[index],
+                    post: postProvider.getLivePosts()[index],
                     userData: userProvider.userData,
                   );
                 },
-              );
-            } else {
-              return Column(
+              )
+            : Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
@@ -158,21 +136,104 @@ class _HomeWidgetState extends State<HomeWidget> {
                     child: Text("Going out?"),
                   ),
                 ],
-              );
-            }
-          },
-        ),
+              ),
         SizedBox(height: 12.0),
         ElevatedButton(
-            onPressed: () {
-              AwesomeNotifications().cancelAll();
-            },
-            child: Text("Cancel Notifications"))
+            onPressed: () => AwesomeNotifications().cancel(43),
+            child: Text("Cancel channel 43")),
+        ElevatedButton(
+            onPressed: () async => await createNoti(), child: Text("send Noti"))
       ],
     );
   }
 
-  Widget _performSearch() {
-    return SizedBox();
+  Future<void> createNoti() async {
+    await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: 43,
+            channelKey: 'basic_channel',
+            title: 'Notification at every single minute',
+            body:
+                'This notification was schedule to repeat at every single minute.'),
+        schedule: NotificationInterval(
+            interval: 60, timeZone: localTimeZone, repeats: true),
+        actionButtons: [
+          NotificationActionButton(
+              key: 'safe',
+              label: "I'm safe",
+              buttonType: ActionButtonType.DisabledAction),
+          NotificationActionButton(
+              key: 'danger',
+              label: "I'm in danger",
+              buttonType: ActionButtonType.Default),
+        ]);
   }
 }
+
+
+
+
+
+//               } else {
+//               return 
+//             }
+//           },
+//         ),
+// AwesomeNotifications()
+              //     .listScheduledNotifications()
+              //     .then((value) async {
+              //   if (value.isEmpty) {
+              //     await AwesomeNotifications().createNotification(
+              //       content: NotificationContent(
+              //         id: post.notificationId,
+              //         channelKey: 'schedule',
+              //         title: "Are you safe?",
+              //         body: "please choose if you're safe or not",
+              //       ),
+              //       schedule: NotificationInterval(
+              //         interval: 60,
+              //         timeZone: localTimeZone,
+              //         repeats: true,
+              //       ),
+              //       // NotificationInterval(
+              //       //     interval: 60,
+              //       //     timeZone: localTimeZone,
+              //       //     repeats: true),
+              //       actionButtons: [
+              //         NotificationActionButton(
+              //             key: 'safe',
+              //             label: "I'm safe",
+              //             actionType: ActionType.DismissAction),
+              //         NotificationActionButton(
+              //             key: 'danger',
+              //             label: "I'm in danger",
+              //             actionType: ActionType.Default),
+              //       ],
+              //     );
+              //   } else {
+              // var notiId = value.map((e) => e.content.id).toList();
+              // if (!notiId.contains(post.notificationId)) {
+              //   AwesomeNotifications().createNotification(
+              //     content: NotificationContent(
+              //       id: post.notificationId,
+              //       channelKey: 'main_channel',
+              //       title: "Are you safe?",
+              //       body: "please choose if you're safe or not",
+              //     ),
+              //     schedule: NotificationInterval(interval: 65),
+              //     actionButtons: [
+              //       NotificationActionButton(
+              //           key: 'safe',
+              //           label: "I'm safe",
+              //           actionType: ActionType.DismissAction),
+              //       NotificationActionButton(
+              //           key: 'danger',
+              //           label: "I'm in danger",
+              //           actionType: ActionType.Default),
+              //     ],
+              //   );
+              // }
+              //       }
+              //     });
+              //   }
+              // });

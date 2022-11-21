@@ -100,8 +100,8 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context);
     final userProvider = Provider.of<UserProvider>(context);
-    print(this.checkDatingUserPicture == null);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -332,7 +332,50 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
               showDialog(
                   context: context,
                   builder: (context) {
-                    return Container(child: Text("helo"));
+                    return Scaffold(
+                      backgroundColor: Colors.transparent,
+                      body: Center(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          height: 500,
+                          child: Card(
+                            child: (ListView(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              children: [
+                                Text(
+                                  "Choose Contact",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                Divider(),
+                                ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount:
+                                        userProvider.userData.contacts.length,
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.pop(
+                                              context,
+                                              userProvider
+                                                  .userData.contacts[index]);
+                                        },
+                                        child: ListTile(
+                                          leading: Icon(Icons.person),
+                                          title: Text(userProvider.userData
+                                              .contacts[index].fullName),
+                                        ),
+                                      );
+                                    })
+                              ],
+                            )),
+                          ),
+                        ),
+                      ),
+                    );
                   });
             },
             edgeInsetsGeometry:
@@ -652,26 +695,31 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                   updatedAt: DateTime.now().millisecondsSinceEpoch,
                   dateTime: DateTime.now());
               debugPrint("${post.notificationId} ${post.checkInterval}");
-              PostOperations.makeNewPost(
-                      userProvider.uid, post, checkDatingUserPicture)
+              postProvider
+                  .makeNewPost(post, checkDatingUserPicture)
                   .then((value) {
                 AwesomeNotifications().createNotification(
                   content: NotificationContent(
                     id: post.notificationId,
-                    channelKey: 'main_channel',
+                    channelKey: 'basic_channel',
                     title: "Are you safe?",
                     body: "please choose if you're safe or not",
                   ),
-                  schedule: NotificationCalendar(minute: 1, repeats: true),
+                  schedule: NotificationInterval(
+                    preciseAlarm: true,
+                    interval: 60,
+                    repeats: true,
+                  ),
                   actionButtons: [
                     NotificationActionButton(
-                        key: 'safe',
-                        label: "I'm safe",
-                        actionType: ActionType.DismissAction),
+                      key: 'safe',
+                      label: "I'm safe",
+                      buttonType: ActionButtonType.DisabledAction,
+                    ),
                     NotificationActionButton(
                         key: 'danger',
                         label: "I'm in danger",
-                        actionType: ActionType.Default),
+                        buttonType: ActionButtonType.Default),
                   ],
                 );
                 showToast(context, "Post Created!");

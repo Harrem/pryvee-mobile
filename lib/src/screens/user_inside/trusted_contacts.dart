@@ -60,8 +60,7 @@ class _TrustedContactsState extends State<TrustedContacts> {
               itemBuilder: (context, index) {
                 return ListTile(
                   leading: Icon(Icons.person),
-                  title:
-                      Text(userProvider.userData.contacts[index].displayName),
+                  title: Text(userProvider.userData.contacts[index].fullName),
                   trailing: IconButton(
                       onPressed: () {
                         userProvider.userData.contacts.removeAt(index);
