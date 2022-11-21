@@ -18,13 +18,13 @@ class UserProvider extends ChangeNotifier {
 
   Future<UserData> initUserData() async {
     uid = auth.currentUser.uid;
-    print("Uid: $uid");
+    // print("Uid: $uid");
     print("initializing User Data");
     var documentSnapshot = await users.doc(uid).get();
-    print(documentSnapshot.data());
+    // print(documentSnapshot.data());
     if (documentSnapshot != null || documentSnapshot.exists) {
       userData = UserData.fromJson(documentSnapshot.data());
-      debugPrint(userData.toJson());
+      // debugPrint(userData.toJson());
       return userData;
     } else {
       debugPrint("Error while initializing user data");
