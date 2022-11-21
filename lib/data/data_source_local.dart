@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pryvee/src/providers_utils/locale_language_notifier.dart';
 import 'package:pryvee/src/providers_utils/session_notifier.dart';
@@ -75,10 +76,11 @@ void clearSharedPrefsByKey(String key) async {
 
 Future<void> pryveeSignOut(BuildContext context) async {
   FirebaseAuth.instance.signOut();
-  Provider.of<LocaleLanguageNotifier>(context, listen: false)
-      .setLocalLocaleLanguage(Locale("fr", "FR"));
-  Provider.of<ThemeNotifier>(context, listen: false).setLocalTheme(lightTheme);
-  Provider.of<SessionNotifier>(context, listen: false).setLocalUserId("");
+  await AwesomeNotifications().cancelAll();
+  // Provider.of<LocaleLanguageNotifier>(context, listen: false)
+  //     .setLocalLocaleLanguage(Locale("fr", "FR"));
+  // Provider.of<ThemeNotifier>(context, listen: false).setLocalTheme(lightTheme);
+  // Provider.of<SessionNotifier>(context, listen: false).setLocalUserId("");
   clearSharedPrefs();
   Provider.of<UserProvider>(context, listen: false).signOut();
   Navigator.of(context)
