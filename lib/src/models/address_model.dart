@@ -58,7 +58,7 @@ class AddressModel {
 
   @override
   String toString() {
-    return 'AddressModel(postCode: $postCode, address: $address, country: $country, city: $city)';
+    return '$address, $city, $country';
   }
 
   @override
