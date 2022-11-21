@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:pryvee/data/data_source_const.dart';
@@ -22,7 +21,7 @@ class UserData {
   String phone;
   String birthDate;
   String picture;
-  List<Contact> contacts;
+  List<UserData> contacts;
   UserData({
     this.addressModel,
     this.maritalStatus,
@@ -74,9 +73,9 @@ class UserData {
         phone: (json['phone'] == null) ? '' : json['phone'].toString(),
         contacts: (json['contacts'] == null)
             ? []
-            : (json['contacts'] as List<dynamic>).map((e) {
-                return Contact.fromMap(e);
-              }).toList(),
+            : (json['contacts'] as List<dynamic>)
+                .map((e) => UserData.fromJson(e))
+                .toList(),
       );
 
   UserData copyWith({
@@ -153,7 +152,7 @@ class UserData {
       phone: map['phone'] as String,
       birthDate: map['birthDate'] as String,
       picture: (map['picture'] as String) ?? DEFAULT_USER_PICTURE,
-      contacts: List<Contact>.from(map['contacts'] as List<dynamic>),
+      contacts: List<UserData>.from(map['contacts'] as List<dynamic>),
     );
   }
 

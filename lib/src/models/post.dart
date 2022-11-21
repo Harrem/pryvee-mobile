@@ -2,8 +2,6 @@
 import 'dart:convert';
 
 import 'package:pryvee/src/models/address_model.dart';
-import 'package:pryvee/src/models/user.dart';
-import 'package:pryvee/src/utils/commun_mix_utility.dart';
 import 'package:pryvee/src/utils/date_utility.dart';
 
 class Post {
@@ -22,23 +20,24 @@ class Post {
   String fullName;
   String phoneNumber;
   String pictureUrl;
-  Post({
-    this.notificationId,
-    this.pid,
-    this.isLive,
-    this.currentUserEmail,
-    this.trustedUserEmail,
-    this.carPlateNumber,
-    this.datingAddress,
-    this.checkInterval,
-    this.createdAt,
-    this.updatedAt,
-    this.transport,
-    this.dateTime,
-    this.fullName,
-    this.phoneNumber,
-    this.pictureUrl,
-  });
+  String trustedUid;
+  Post(
+      {this.notificationId,
+      this.pid,
+      this.isLive,
+      this.currentUserEmail,
+      this.trustedUserEmail,
+      this.carPlateNumber,
+      this.datingAddress,
+      this.checkInterval,
+      this.createdAt,
+      this.updatedAt,
+      this.transport,
+      this.dateTime,
+      this.fullName,
+      this.phoneNumber,
+      this.pictureUrl,
+      this.trustedUid});
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
         notificationId: (json['id'] == null) ? 0 : json['id'] as int,
@@ -70,6 +69,8 @@ class Post {
             (json['phoneNumber'] == null) ? '' : json['phoneNumber'].toString(),
         pictureUrl:
             (json['pictureUrl'] == null) ? '' : json['pictureUrl'].toString(),
+        trustedUid:
+            (json['trustedUid'] == null) ? '' : json['trustedUid'].toString(),
       );
 
   Map<String, dynamic> toMap() {
@@ -89,6 +90,7 @@ class Post {
       'fullName': fullName,
       'phoneNumber': phoneNumber,
       'pictureUrl': pictureUrl,
+      'trustedUid': trustedUid,
     };
   }
 
@@ -110,6 +112,7 @@ class Post {
       fullName: map['fullName'] as String,
       phoneNumber: map['phoneNumber'] as String,
       pictureUrl: map['pictureUrl'] as String,
+      trustedUid: map['trustedUid'] as String,
     );
   }
 
