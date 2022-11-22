@@ -20,6 +20,8 @@ import 'package:flutter/material.dart';
 // ignore_for_file: must_be_immutable
 import 'dart:io';
 
+import '../../providers_utils/post_provider.dart';
+
 class AccountWidget extends StatefulWidget {
   AccountWidget({Key key}) : super(key: key);
   @override
@@ -117,7 +119,10 @@ class _AccountWidgetState extends State<AccountWidget> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: '234',
+                  text: Provider.of<PostProvider>(context)
+                      .posts
+                      .length
+                      .toString(),
                   style: Theme.of(context).textTheme.headline2.merge(
                         TextStyle(
                           fontSize: 16.0,
@@ -165,7 +170,10 @@ class _AccountWidgetState extends State<AccountWidget> {
               RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: '5',
+                  text: Provider.of<PostProvider>(context)
+                      .getLivePosts()
+                      .length
+                      .toString(),
                   style: Theme.of(context).textTheme.headline2.merge(
                         TextStyle(
                           fontSize: 16.0,
