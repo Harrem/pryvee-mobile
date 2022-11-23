@@ -29,6 +29,7 @@ class _UserTabsWidget extends State<UserTabsWidget> {
   ScrollController scrollController =
       ScrollController(initialScrollOffset: 0.0, keepScrollOffset: true);
   DataSourceGet apiGet = DataSourceGet();
+  bool isLoading = true;
   List<CommunSelectModel> communSelectModelList = [
     CommunSelectModel("Home", true),
     CommunSelectModel("Post", true),
@@ -66,10 +67,17 @@ class _UserTabsWidget extends State<UserTabsWidget> {
 
   @override
   void initState() {
+    Provider.of<UserProvider>(context, listen: false)
+        .initUserData()
+        .then((user) {
+      if (this.mounted)
+        setState(() {
+          isLoading = false;
+          selectTab(widget.currentTab);
+        });
+    });
+
     super.initState();
-    if (this.mounted) {
-      selectTab(widget.currentTab);
-    }
   }
 
   @override
@@ -80,99 +88,84 @@ class _UserTabsWidget extends State<UserTabsWidget> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    final postProvider = Provider.of<PostProvider>(context);
-    return FutureBuilder(
-      future: userProvider.initUserData(),
-      builder: ((context, snapshot) {
-        bool isLoading = true;
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          isLoading = true;
-        } else if (snapshot.connectionState == ConnectionState.done) {
-          if (snapshot.hasData) {
-            postProvider.fetchAllPostes(userProvider.uid);
-            isLoading = false;
-          } else {}
-        }
-        return Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EditAccountWidget(
-                            userData: userProvider.userData,
-                          ))),
-              splashRadius: 24.0,
-              icon: Icon(
-                Icons.sort,
-                size: 20.0,
-                color: Theme.of(context).colorScheme.secondary,
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EditAccountWidget(
+                        userData: userProvider.userData,
+                      ))),
+          splashRadius: 24.0,
+          icon: Icon(
+            Icons.sort,
+            size: 20.0,
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
+        title: Text(
+          this.communSelectModelList.elementAt(widget.currentTab).name,
+          style: Theme.of(context).textTheme.headline4.merge(
+                TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
               ),
+        ),
+        actions: <Widget>[
+          IconButton(
+              onPressed: () {
+                pryveeSignOut(context);
+              },
+              icon: Icon(
+                Icons.output_rounded,
+                color: Colors.black,
+              )),
+          isLoading
+              ? UserAvatarButtonWidget()
+              : UserAvatarButtonWidget(
+                  profileUrl: userProvider.userData.picture)
+        ],
+      ),
+      body: SafeArea(
+        child: widget.currentPage,
+      ),
+      bottomNavigationBar: SafeArea(
+        child: CurvedNavigationBar(
+          buttonBackgroundColor: APP_COLOR,
+          backgroundColor: Colors.transparent,
+          onTap: (int i) => this.selectTab(i),
+          index: widget.selectedTab,
+          animationDuration: Duration(milliseconds: 400),
+          animationCurve: Curves.easeOut,
+          color: APP_COLOR,
+          height: 50.0,
+          items: <Widget>[
+            Icon(
+              UiIcons.home,
+              size: 16.0,
+              color: Colors.white,
             ),
-            title: Text(
-              this.communSelectModelList.elementAt(widget.currentTab).name,
-              style: Theme.of(context).textTheme.headline4.merge(
-                    TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
-                  ),
+            Icon(
+              UiIcons.layers,
+              size: 16.0,
+              color: Colors.white,
             ),
-            actions: <Widget>[
-              IconButton(
-                  onPressed: () {
-                    pryveeSignOut(context);
-                  },
-                  icon: Icon(
-                    Icons.output_rounded,
-                    color: Colors.black,
-                  )),
-              isLoading
-                  ? UserAvatarButtonWidget()
-                  : UserAvatarButtonWidget(
-                      profileUrl: userProvider.userData.picture)
-            ],
-          ),
-          body: SafeArea(
-            child: widget.currentPage,
-          ),
-          bottomNavigationBar: SafeArea(
-            child: CurvedNavigationBar(
-              buttonBackgroundColor: APP_COLOR,
-              backgroundColor: Colors.transparent,
-              onTap: (int i) => this.selectTab(i),
-              index: widget.selectedTab,
-              animationDuration: Duration(milliseconds: 400),
-              animationCurve: Curves.easeOut,
-              color: APP_COLOR,
-              height: 50.0,
-              items: <Widget>[
-                Icon(
-                  UiIcons.home,
-                  size: 16.0,
-                  color: Colors.white,
-                ),
-                Icon(
-                  UiIcons.layers,
-                  size: 16.0,
-                  color: Colors.white,
-                ),
-                Icon(
-                  UiIcons.message_1,
-                  size: 16.0,
-                  color: Colors.white,
-                ),
-                Icon(
-                  UiIcons.user_1,
-                  size: 16.0,
-                  color: Colors.white,
-                ),
-              ],
+            Icon(
+              UiIcons.message_1,
+              size: 16.0,
+              color: Colors.white,
             ),
-          ),
-        );
-      }),
+            Icon(
+              UiIcons.user_1,
+              size: 16.0,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

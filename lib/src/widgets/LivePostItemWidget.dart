@@ -140,26 +140,6 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                 Row(
                   children: [
                     Icon(
-                      Icons.linear_scale_rounded,
-                      color: Colors.grey,
-                      size: 20.0,
-                    ),
-                    SizedBox(width: 4.0),
-                    Expanded(
-                      child: Text(
-                        '22.3 KM Away',
-                        style: Theme.of(context).textTheme.bodyText1,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        maxLines: 1,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    Icon(
                       Icons.car_crash_sharp,
                       color: Colors.grey,
                       size: 20.0,
@@ -176,6 +156,7 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     ),
                   ],
                 ),
+                SizedBox(height: 8.0),
                 GestureDetector(
                   onDoubleTap: () async {
                     await Clipboard.setData(

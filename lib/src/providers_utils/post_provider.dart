@@ -9,6 +9,7 @@ import 'package:pryvee/src/models/post.dart';
 
 class PostProvider extends ChangeNotifier {
   List<Post> posts;
+  List<Post> livePosts;
   String uid;
 
   Future<void> fetchAllPostes(String uid) async {
@@ -24,6 +25,7 @@ class PostProvider extends ChangeNotifier {
     final list = docs.map((e) => Post.fromJson(e.data())).toList();
     list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     posts = list;
+    livePosts = getLivePosts(list);
   }
 
   Future<void> makeNewPost(Post post, File profilePic) async {
@@ -72,7 +74,7 @@ class PostProvider extends ChangeNotifier {
     return url;
   }
 
-  List<Post> getLivePosts() {
+  List<Post> getLivePosts(List<Post> list) {
     List<Post> livePosts = [];
     posts.forEach((post) {
       if (post.isLive) {

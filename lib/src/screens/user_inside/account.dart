@@ -171,7 +171,7 @@ class _AccountWidgetState extends State<AccountWidget> {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: Provider.of<PostProvider>(context)
-                      .getLivePosts()
+                      .livePosts
                       .length
                       .toString(),
                   style: Theme.of(context).textTheme.headline2.merge(

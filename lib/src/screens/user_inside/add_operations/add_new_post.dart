@@ -707,7 +707,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                   ),
                   schedule: NotificationInterval(
                     preciseAlarm: true,
-                    interval: 60,
+                    interval: post.checkInterval * 60,
                     repeats: true,
                   ),
                   actionButtons: [
