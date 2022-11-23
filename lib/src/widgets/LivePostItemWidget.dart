@@ -298,6 +298,9 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     Expanded(
                       child: GestureDetector(
                         child: CommunChipWidget(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/notification-page');
+                          },
                           edgeInsetsGeometry: EdgeInsets.symmetric(
                               vertical: 6.0, horizontal: 12.0),
                           borderRadiusGeometry: BorderRadius.circular(8.0),
@@ -317,12 +320,7 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     SizedBox(width: 4.0),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {
-                          postProvider.deletePost(widget.post).then((value) {
-                            showToast(context, "Post Removed");
-                            setState(() {});
-                          }).catchError((e) => showToast(context, "Error: $e"));
-                        },
+                        onTap: () {},
                         child: CommunChipWidget(
                           edgeInsetsGeometry: EdgeInsets.symmetric(
                               vertical: 6.0, horizontal: 12.0),
