@@ -20,7 +20,6 @@ import 'package:pryvee/src/screens/user_inside/trusted_contacts.dart';
 import 'package:pryvee/src/screens/user_inside/user_tabs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
-import 'package:pryvee/src/utils/navigation_service.dart';
 import 'package:pryvee/src/screens/on_boarding.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:pryvee/src/screens/sign_up.dart';
@@ -103,13 +102,6 @@ class _MyApp extends State<MyApp> {
         NotificationController.onActionReceivedMethod(receivedAction);
       }
     });
-    // _sub = FirebaseAuth.instance.authStateChanges().listen((user) async {
-    //   if (user != null) {
-    //       navigatorKey.currentState.pushReplacementNamed(RouteGenerator.home);
-    //   }else {
-    //     navigatorKey.currentState.pushReplacementNamed(RouteGenerator.signIn);
-    //   }
-    // });
   }
 
   @override
@@ -118,7 +110,7 @@ class _MyApp extends State<MyApp> {
           ChangeNotifierProvider<UserProvider>(
               create: (context) => UserProvider()),
           ChangeNotifierProvider<PostProvider>(
-              create: (context) => PostProvider())
+              create: (context) => PostProvider()),
         ],
         child: Consumer2<ThemeNotifier, SessionNotifier>(
           builder: (context, themeNotifier, sessionNotifier, _) =>
@@ -152,8 +144,7 @@ class _MyApp extends State<MyApp> {
                     return MaterialPageRoute(
                         builder: (_) => ForgotPasswordWidget());
                   case '/UserTabs':
-                    return MaterialPageRoute(
-                        builder: (_) => UserTabsWidget(currentTab: args));
+                    return MaterialPageRoute(builder: (_) => UserTabsWidget());
                   case '/TrustedContacts':
                     return MaterialPageRoute(builder: (_) => TrustedContacts());
                   case '/notification-page':
