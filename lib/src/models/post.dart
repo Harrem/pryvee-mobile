@@ -10,7 +10,6 @@ class Post {
   bool isLive;
   AddressModel datingAddress;
   String currentUserEmail;
-  String trustedUserEmail;
   String carPlateNumber;
   DateTime dateTime;
   int checkInterval;
@@ -21,6 +20,9 @@ class Post {
   String phoneNumber;
   String pictureUrl;
   String trustedUid;
+  String trustedUserName;
+  String trustedUserEmail;
+  String trustedUserPhoneNumber;
   Post(
       {this.notificationId,
       this.pid,
@@ -37,7 +39,9 @@ class Post {
       this.fullName,
       this.phoneNumber,
       this.pictureUrl,
-      this.trustedUid});
+      this.trustedUid,
+      this.trustedUserName,
+      this.trustedUserPhoneNumber});
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
         notificationId: (json['id'] == null) ? 0 : json['id'] as int,
@@ -71,6 +75,12 @@ class Post {
             (json['pictureUrl'] == null) ? '' : json['pictureUrl'].toString(),
         trustedUid:
             (json['trustedUid'] == null) ? '' : json['trustedUid'].toString(),
+        trustedUserPhoneNumber: (json['trustedUserPhoneNumber'] == null)
+            ? ''
+            : json['trustedUserPhoneNumber'].toString(),
+        trustedUserName: (json['trustedUserName'] == null)
+            ? ''
+            : json['trustedUserName'].toString(),
       );
 
   Map<String, dynamic> toMap() {
@@ -91,6 +101,8 @@ class Post {
       'phoneNumber': phoneNumber,
       'pictureUrl': pictureUrl,
       'trustedUid': trustedUid,
+      'trustedUserName': trustedUserName,
+      'trustedUserPhoneNumber': trustedUserPhoneNumber,
     };
   }
 
@@ -113,6 +125,8 @@ class Post {
       phoneNumber: map['phoneNumber'] as String,
       pictureUrl: map['pictureUrl'] as String,
       trustedUid: map['trustedUid'] as String,
+      trustedUserName: map['trustedUserName'] as String,
+      trustedUserPhoneNumber: map['trustedUserPhoneNumber'] as String,
     );
   }
 
