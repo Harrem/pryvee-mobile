@@ -325,7 +325,26 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                         ),
                       ),
                 )
-              : SizedBox(),
+              : SizedBox(
+                  child: ListTile(
+                    title: Text(checkTrustedUser.fullName),
+                    leading: Icon(
+                      Icons.check,
+                      color: Colors.green,
+                    ),
+                    trailing: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          checkTrustedUser = null;
+                        });
+                      },
+                      icon: Icon(
+                        Icons.remove_circle,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ),
           SizedBox(height: 8.0),
           CommunChipWidget(
             onTap: () {
@@ -358,10 +377,9 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                                     itemBuilder: (context, index) {
                                       return InkWell(
                                         onTap: () {
-                                          Navigator.pop(
-                                              context,
-                                              userProvider
-                                                  .userData.contacts[index]);
+                                          checkTrustedUser = userProvider
+                                              .userData.contacts[index];
+                                          Navigator.pop(context);
                                         },
                                         child: ListTile(
                                           leading: Icon(Icons.person),
@@ -376,7 +394,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                         ),
                       ),
                     );
-                  });
+                  }).then((value) => setState(() {}));
             },
             edgeInsetsGeometry:
                 EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
@@ -678,22 +696,28 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
           CommunTextButtonWidget(
             onPressed: () async {
               Post post = Post(
-                  notificationId: Random().nextInt(1000000),
-                  isLive: true,
-                  fullName:
-                      "$checkDatingUserFirstname $checkDatingUserLastname",
-                  phoneNumber: checkDatingUserPhoneNumber,
-                  datingAddress: AddressModel(
-                      country: checkDatingCountry,
-                      city: checkDatingCity,
-                      address: checkDatingAddress,
-                      postCode: checkDatingPostcode),
-                  transport: checkTransport,
-                  carPlateNumber: checkCarPlateNumber,
-                  checkInterval: int.parse(checkInterval),
-                  createdAt: DateTime.now().millisecondsSinceEpoch,
-                  updatedAt: DateTime.now().millisecondsSinceEpoch,
-                  dateTime: DateTime.now());
+                notificationId: Random().nextInt(1000000),
+                isLive: true,
+                fullName: "$checkDatingUserFirstname $checkDatingUserLastname",
+                phoneNumber: checkDatingUserPhoneNumber,
+                datingAddress: AddressModel(
+                    country: checkDatingCountry,
+                    city: checkDatingCity,
+                    address: checkDatingAddress,
+                    postCode: checkDatingPostcode),
+                transport: checkTransport,
+                carPlateNumber: checkCarPlateNumber,
+                checkInterval: 1,
+
+                // int.parse(checkInterval),
+                createdAt: DateTime.now().millisecondsSinceEpoch,
+                updatedAt: DateTime.now().millisecondsSinceEpoch,
+                dateTime: DateTime.now(),
+                trustedUid: checkTrustedUser.uid,
+                trustedUserEmail: checkTrustedUser.email,
+                trustedUserName: checkTrustedUser.fullName,
+                trustedUserPhoneNumber: checkTrustedUser.phone,
+              );
               debugPrint("${post.notificationId} ${post.checkInterval}");
               postProvider
                   .makeNewPost(post, checkDatingUserPicture)

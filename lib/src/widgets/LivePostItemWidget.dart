@@ -299,7 +299,8 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                       child: GestureDetector(
                         child: CommunChipWidget(
                           onTap: () {
-                            Navigator.pushNamed(context, '/notification-page');
+                            Navigator.pushNamed(context, '/notification-page',
+                                arguments: widget.post.notificationId);
                           },
                           edgeInsetsGeometry: EdgeInsets.symmetric(
                               vertical: 6.0, horizontal: 12.0),
@@ -320,7 +321,55 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     SizedBox(width: 4.0),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: Container(
+                                    padding: EdgeInsets.all(20),
+                                    height: 150,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Do you want to keep watching you?",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline4,
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            OutlinedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text("Keep Watch"),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Provider.of<PostProvider>(
+                                                        context)
+                                                    .deletePost(widget.post)
+                                                    .then((value) => showToast(
+                                                        context,
+                                                        "Post Removed!"));
+                                              },
+                                              child: Text("Remove"),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
                         child: CommunChipWidget(
                           edgeInsetsGeometry: EdgeInsets.symmetric(
                               vertical: 6.0, horizontal: 12.0),
