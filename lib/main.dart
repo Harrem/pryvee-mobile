@@ -148,7 +148,8 @@ class _MyApp extends State<MyApp> {
                   case '/TrustedContacts':
                     return MaterialPageRoute(builder: (_) => TrustedContacts());
                   case '/notification-page':
-                    return MaterialPageRoute(builder: (_) => SOSPage());
+                    return MaterialPageRoute(
+                        builder: (_) => SOSPage(nid: args));
                   default:
                     return MaterialPageRoute(
                         builder: (_) => OnBoardingWidget());
