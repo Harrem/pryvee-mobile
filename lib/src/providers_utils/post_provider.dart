@@ -84,6 +84,23 @@ class PostProvider extends ChangeNotifier {
     return livePosts;
   }
 
+  Post getPost(int nid) {
+    Post p;
+    livePosts.forEach((element) {
+      if (element.notificationId == nid) {
+        p = element;
+      }
+    });
+    return p;
+  }
+
+  Future<void> forwardInfo(Post post) async {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(post.trustedUid)
+        .update({'inbox': 'I need your help ASAP!'});
+  }
+
   Future<void> deletePost(Post post) async {
     await FirebaseFirestore.instance
         .collection('tempPostKeeper')
