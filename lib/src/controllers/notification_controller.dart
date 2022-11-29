@@ -32,7 +32,8 @@ class NotificationController {
     debugPrint(receivedAction.toString());
     if (receivedAction.buttonKeyPressed == "danger") {
       // Navigate into pages, avoiding to open the notification details page over another details page already opened
-      MyApp.navigatorKey.currentState?.pushNamed('/notification-page');
+      MyApp.navigatorKey.currentState
+          ?.pushNamed('/notification-page', arguments: receivedAction.id);
     }
   }
 }
