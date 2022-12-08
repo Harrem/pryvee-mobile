@@ -1,6 +1,7 @@
 import 'package:pryvee/config/app_config.dart' as appConfig;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pryvee/data/data_source_const.dart';
 
 final darkTheme = ThemeData(
     fontFamily: 'Nunito',
@@ -66,13 +67,13 @@ final lightTheme = ThemeData(
     primaryColor: Colors.white,
     appBarTheme: AppBarTheme(
       foregroundColor: Colors.black,
-      color: Colors.white,
       elevation: 0,
+      backgroundColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle.dark,
     ),
     brightness: Brightness.light,
     colorScheme: ColorScheme(
-        primary: Colors.black,
+        primary: APP_COLOR,
         primaryContainer: Colors.black,
         secondary: appConfig.Colors().mainColor(1),
         secondaryContainer: Colors.black,
@@ -87,6 +88,13 @@ final lightTheme = ThemeData(
         brightness: Brightness.light),
     hintColor: appConfig.Colors().secondColor(1.0),
     focusColor: appConfig.Colors().accentColor(0.8),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: APP_COLOR,
+      ),
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
     textTheme: TextTheme(
         button: TextStyle(color: Colors.white),
         headline2: TextStyle(
