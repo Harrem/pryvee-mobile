@@ -31,6 +31,7 @@ class CloudStore {
         .collection("conversations")
         .doc(cid)
         .collection("messages")
+        .orderBy("sentDate", descending: true)
         .snapshots()
         .map((snapshot) {
       return snapshot.docs.map((e) {
