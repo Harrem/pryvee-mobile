@@ -6,6 +6,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pryvee/src/models/user.dart';
 
+import '../models/conversation.dart';
+
 class UserProvider extends ChangeNotifier {
   UserData userData;
   CollectionReference users;
@@ -21,7 +23,7 @@ class UserProvider extends ChangeNotifier {
     // print("Uid: $uid");
     print("initializing User Data");
     var documentSnapshot = await users.doc(uid).get();
-    // print(documentSnapshot.data());
+    print(documentSnapshot.data());
     if (documentSnapshot != null || documentSnapshot.exists) {
       userData = UserData.fromJson(documentSnapshot.data());
       // debugPrint(userData.toJson());
@@ -106,8 +108,35 @@ class UserProvider extends ChangeNotifier {
     return url;
   }
 
+  Future<Conversation> createConversation(String fromUid, String toUid) async {
+    final firestore = FirebaseFirestore.instance;
+    final docRef = await firestore
+        .collection("conversations")
+        .add({'toUid': toUid, 'fromUid': fromUid});
+    String ref = docRef.id;
+    Conversation conv = Conversation(
+        cid: ref, createdDate: DateTime.now(), user1: fromUid, user2: toUid);
+
+    userData.conversations.add(conv);
+
+    await firestore.collection('users').doc(toUid).get().then((value) async {
+      debugPrint("${toUid}");
+      debugPrint("${value.data()}");
+      var list = value.data()['conversations'] as List<dynamic>;
+      list.add(conv.toMap());
+      await firestore
+          .collection('users')
+          .doc(toUid)
+          .update({"conversations": list});
+    });
+
+    updateUserData();
+    return conv;
+  }
+
   Future<void> updateUserData() async {
     users.doc(auth.currentUser.uid).update(userData.toMap());
+    notifyListeners();
   }
 
   void signOut() {
