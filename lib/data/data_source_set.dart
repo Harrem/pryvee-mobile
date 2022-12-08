@@ -72,37 +72,22 @@ class DataSourceSet {
         await auth.signUpWithEmailAndPassword(email: email, password: password);
     user.updateDisplayName("$firstName $lastName");
     UserData userData = UserData(
-        uid: user.uid,
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-        createdAt: DateTime.now().toIso8601String(),
-        picture: DEFAULT_USER_PICTURE);
+      uid: user.uid,
+      email: email,
+      firstName: firstName,
+      lastName: lastName,
+      createdAt: DateTime.now().toIso8601String(),
+      picture: DEFAULT_USER_PICTURE,
+      conversations: [],
+      contacts: [],
+    );
 
-    DocumentSnapshot<Object> documentSnapshot =
-        await users.doc(userData.uid).get();
-    // Map<String, String> map = {
-    //   'userId': user.uid,
-    //   'joinedDate': DateTime.now().millisecondsSinceEpoch.toString(),
-    //   'picture': 'user/default-profile-picture',
-    //   'maritalStatus': 'PREFER_NOT_TO_SAY',
-    //   'gender': 'PREFER_NOT_TO_SAY',
-    //   'firstName': firstName,
-    //   'lastName': lastName,
-    //   'email': email,
-    // };
-
-    if (documentSnapshot == null || documentSnapshot.exists == false) {
-      await users.doc(user.uid).set(userData.toMap());
-    }
+    await users.doc(user.uid).set(userData.toMap());
 
     if (user != null)
       return user;
     else
       return null;
-    //   return User.fromJson(map);
-    // } else
-    //   return null;
   }
 
   Future<void> deleteCurrentUserAPI() async =>

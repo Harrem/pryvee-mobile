@@ -362,7 +362,9 @@ class _SignUpWidget extends State<SignUpWidget> {
                                           ).catchError(
                                             (onError) => setState(
                                               () {
-                                                showToast(context, onError,
+                                                debugPrint("$onError");
+                                                showToast(
+                                                    context, onError.toString(),
                                                     seconds: 3);
                                                 this.isLoading =
                                                     !this.isLoading;
