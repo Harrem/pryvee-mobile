@@ -67,6 +67,7 @@ class _UserTabsWidget extends State<UserTabsWidget>
       length: 4,
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
           elevation: 0,
           leading: IconButton(
