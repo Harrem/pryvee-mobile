@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/src/models/address_model.dart';
+import 'package:pryvee/src/models/conversation.dart';
 
 class UserData {
   AddressModel addressModel;
@@ -22,23 +23,24 @@ class UserData {
   String birthDate;
   String picture;
   List<UserData> contacts;
-  UserData({
-    this.addressModel,
-    this.maritalStatus,
-    this.isEmailValid,
-    this.uid,
-    this.fullName,
-    this.firstName,
-    this.lastName,
-    this.createdAt,
-    this.updatedAt,
-    this.email,
-    this.gender,
-    this.phone,
-    this.birthDate,
-    this.picture,
-    this.contacts,
-  });
+  List<Conversation> conversations;
+  UserData(
+      {this.addressModel,
+      this.maritalStatus,
+      this.isEmailValid,
+      this.uid,
+      this.fullName,
+      this.firstName,
+      this.lastName,
+      this.createdAt,
+      this.updatedAt,
+      this.email,
+      this.gender,
+      this.phone,
+      this.birthDate,
+      this.picture,
+      this.contacts,
+      this.conversations});
 
   factory UserData.fromJson(Map<String, dynamic> json) => UserData(
         fullName: (json['firstName'] != null && json['lastName'] != null)
@@ -76,6 +78,14 @@ class UserData {
             : (json['contacts'] as List<dynamic>)
                 .map((e) => UserData.fromJson(e))
                 .toList(),
+        conversations: List<Conversation>.from(
+          ((json['conversations'] == null)
+                  ? []
+                  : json['conversations'] as List<dynamic>)
+              .map<Conversation>(
+            (x) => Conversation.fromMap(x as Map<String, dynamic>),
+          ),
+        ),
       );
 
   UserData copyWith({
@@ -94,6 +104,7 @@ class UserData {
     String birthDate,
     String picture,
     List<String> contacts,
+    List<Conversation> conversations,
   }) {
     return UserData(
       addressModel: addressModel ?? this.addressModel,
@@ -111,6 +122,7 @@ class UserData {
       birthDate: birthDate ?? this.birthDate,
       picture: picture ?? this.picture,
       contacts: contacts ?? this.contacts,
+      conversations: conversations ?? this.conversations,
     );
   }
 
@@ -131,6 +143,7 @@ class UserData {
       'birthDate': birthDate,
       'picture': picture,
       'contacts': contacts.map((e) => e.toMap()).toList(),
+      'conversations': conversations.map((e) => e.toMap()).toList(),
     };
   }
 
@@ -153,6 +166,8 @@ class UserData {
       birthDate: map['birthDate'] as String,
       picture: (map['picture'] as String) ?? DEFAULT_USER_PICTURE,
       contacts: List<UserData>.from(map['contacts'] as List<dynamic>),
+      conversations:
+          List<Conversation>.from(map['conversations'] as List<dynamic>),
     );
   }
 
@@ -181,7 +196,8 @@ class UserData {
         other.phone == phone &&
         other.birthDate == birthDate &&
         other.picture == picture &&
-        listEquals(other.contacts, contacts);
+        listEquals(other.contacts, contacts) &&
+        listEquals(other.conversations, conversations);
   }
 
   @override
@@ -200,6 +216,7 @@ class UserData {
         phone.hashCode ^
         birthDate.hashCode ^
         picture.hashCode ^
-        contacts.hashCode;
+        contacts.hashCode ^
+        conversations.hashCode;
   }
 }

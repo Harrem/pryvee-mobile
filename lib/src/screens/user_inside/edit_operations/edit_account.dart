@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/models/user.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
@@ -241,7 +242,7 @@ class _EditAccountWidget extends State<EditAccountWidget> {
                 setState(() => checkDateOfBirth = birthDate.toString());
             },
             child: Text(
-              getYMMMMEEEEd(checkDateOfBirth ?? DateTime.now().toString()),
+              ("${checkDateOfBirth ?? DateFormat.yMMMEd().format(DateTime.now())}"),
               style: Theme.of(context).textTheme.bodyText1,
             ),
           ),

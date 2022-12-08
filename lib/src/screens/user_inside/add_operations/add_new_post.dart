@@ -707,7 +707,7 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                     postCode: checkDatingPostcode),
                 transport: checkTransport,
                 carPlateNumber: checkCarPlateNumber,
-                checkInterval: 1,
+                checkInterval: int.parse(checkInterval),
 
                 // int.parse(checkInterval),
                 createdAt: DateTime.now().millisecondsSinceEpoch,
