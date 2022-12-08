@@ -90,32 +90,35 @@ class _HomeWidgetState extends State<HomeWidget> {
               // ),
               SizedBox(height: 12.0),
               SizedBox(height: 12.0),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Running now'.toUpperCase(),
-                      style: Theme.of(context).textTheme.headline2.merge(
-                            TextStyle(
-                              fontSize: 10.0,
-                            ),
-                          ),
-                    ),
-                  ),
-                  SizedBox(width: 8.0),
-                  Text(
-                    'See all'.toUpperCase(),
-                    style: Theme.of(context).textTheme.headline2.merge(
-                          TextStyle(
-                            fontSize: 10.0,
-                            color: APP_COLOR,
+              livePosts.length == 0
+                  ? Center(
+                      child: Text("You don't have any posts yet"),
+                    )
+                  : Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Running now'.toUpperCase(),
+                            style: Theme.of(context).textTheme.headline2.merge(
+                                  TextStyle(
+                                    fontSize: 10.0,
+                                  ),
+                                ),
                           ),
                         ),
-                  ),
-                ],
-              ),
+                        SizedBox(width: 8.0),
+                        Text(
+                          'See all'.toUpperCase(),
+                          style: Theme.of(context).textTheme.headline2.merge(
+                                TextStyle(
+                                  fontSize: 10.0,
+                                  color: APP_COLOR,
+                                ),
+                              ),
+                        ),
+                      ],
+                    ),
               SizedBox(height: 12.0),
-              Text("${Provider.of<PostProvider>(context).livePosts.length}"),
               livePosts != null
                   ? ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
@@ -151,12 +154,12 @@ class _HomeWidgetState extends State<HomeWidget> {
                       ],
                     ),
               SizedBox(height: 12.0),
-              ElevatedButton(
-                  onPressed: () => AwesomeNotifications().cancel(43),
-                  child: Text("Cancel Test Notification")),
-              ElevatedButton(
-                  onPressed: () async => await createNoti(),
-                  child: Text("create Test notification"))
+              // ElevatedButton(
+              //     onPressed: () => AwesomeNotifications().cancel(43),
+              //     child: Text("Cancel Test Notification")),
+              // ElevatedButton(
+              //     onPressed: () async => await createNoti(),
+              //     child: Text("create Test notification"))
             ],
           );
   }

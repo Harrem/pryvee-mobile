@@ -1,5 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:pryvee/data/data_source_local.dart';
+import 'package:pryvee/src/screens/user_inside/conversation_screen.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:pryvee/src/widgets/UserAvatarButtonWidget.dart';
@@ -69,12 +70,7 @@ class _UserTabsWidget extends State<UserTabsWidget>
           automaticallyImplyLeading: false,
           elevation: 0,
           leading: IconButton(
-            onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => EditAccountWidget(
-                          userData: userProvider.userData,
-                        ))),
+            onPressed: () {},
             splashRadius: 24.0,
             icon: Icon(
               Icons.sort,
@@ -110,7 +106,7 @@ class _UserTabsWidget extends State<UserTabsWidget>
           children: [
             HomeWidget(),
             PostsWidget(),
-            PostsWidget(),
+            ConversationScreen(),
             AccountWidget(),
           ],
         ),

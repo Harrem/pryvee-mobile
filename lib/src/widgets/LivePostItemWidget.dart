@@ -354,11 +354,13 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                                             ElevatedButton(
                                               onPressed: () {
                                                 Provider.of<PostProvider>(
-                                                        context)
+                                                        context,
+                                                        listen: false)
                                                     .deletePost(widget.post)
                                                     .then((value) => showToast(
                                                         context,
                                                         "Post Removed!"));
+                                                Navigator.pop(context);
                                               },
                                               child: Text("Remove"),
                                             ),
