@@ -108,31 +108,29 @@ class UserProvider extends ChangeNotifier {
     return url;
   }
 
-  Future<Conversation> createConversation(String fromUid, String toUid) async {
-    final firestore = FirebaseFirestore.instance;
-    final docRef = await firestore
-        .collection("conversations")
-        .add({'toUid': toUid, 'fromUid': fromUid});
-    String ref = docRef.id;
-    Conversation conv = Conversation(
-        cid: ref, createdDate: DateTime.now(), user1: fromUid, user2: toUid);
+  // Future<Conversation> createConversation(String fromUid, String toUid) async {
+  //   final firestore = FirebaseFirestore.instance;
+  //   final docRef = await firestore
+  //       .collection("conversations")
+  //       .add({'toUid': toUid, 'fromUid': fromUid});
+  //   String ref = docRef.id;
+  //   Conversation conv = Conversation(
+  //       cid: ref, createdDate: DateTime.now(), user1: fromUid, user2: toUid);
 
-    userData.conversations.add(conv);
+  //   userData.conversations.add(conv);
 
-    await firestore.collection('users').doc(toUid).get().then((value) async {
-      debugPrint("${toUid}");
-      debugPrint("${value.data()}");
-      var list = value.data()['conversations'] as List<dynamic>;
-      list.add(conv.toMap());
-      await firestore
-          .collection('users')
-          .doc(toUid)
-          .update({"conversations": list});
-    });
+  //   await firestore.collection('users').doc(toUid).get().then((value) async {
+  //     var list = value.data()['conversations'] as List<dynamic>;
+  //     list.add(conv.toMap());
+  //     await firestore
+  //         .collection('users')
+  //         .doc(toUid)
+  //         .update({"conversations": list});
+  //   });
 
-    updateUserData();
-    return conv;
-  }
+  //   updateUserData();
+  //   return conv;
+  // }
 
   Future<void> updateUserData() async {
     users.doc(auth.currentUser.uid).update(userData.toMap());
