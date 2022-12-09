@@ -94,7 +94,11 @@ final lightTheme = ThemeData(
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(15),
+        borderSide: BorderSide.none,
+      ),
+    ),
     textTheme: TextTheme(
         button: TextStyle(color: Colors.white),
         headline2: TextStyle(

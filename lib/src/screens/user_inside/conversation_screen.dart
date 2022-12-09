@@ -1,6 +1,8 @@
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/models/conversation.dart';
 import 'package:pryvee/src/models/with_user_data.dart';
+import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/messaging.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
@@ -11,6 +13,7 @@ import 'package:pryvee/data/data_source_get.dart';
 import 'package:flutter/material.dart';
 
 import '../../controllers/cloudStore.dart';
+import '../../models/message.dart';
 
 class ConversationScreen extends StatefulWidget {
   ConversationScreen({Key key}) : super(key: key);
@@ -24,6 +27,10 @@ class _ConversationScreen extends State<ConversationScreen> {
 
   @override
   void initState() {
+    final p = Provider.of<ConversationProvider>(context, listen: false);
+    p.conversations = Provider.of<UserProvider>(context, listen: false)
+        .userData
+        .conversations;
     if (mounted) {}
     super.initState();
   }
@@ -31,6 +38,7 @@ class _ConversationScreen extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
+    final conversationProvider = Provider.of<ConversationProvider>(context);
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       children: [
@@ -112,6 +120,33 @@ class _ConversationScreen extends State<ConversationScreen> {
           ),
         ),
         SizedBox(height: 8.0),
+        ElevatedButton(
+            onPressed: () {
+              final p =
+                  Provider.of<ConversationProvider>(context, listen: false);
+              var cids = userProvider.userData.conversations
+                  .map((e) => e.cid)
+                  .toList();
+              p.conversations = userProvider.userData.conversations;
+              debugPrint("${p.conversations.first}");
+              p.readMessage(p.conversations.first.cid);
+            },
+            child: Text("Test")),
+        StreamBuilder(
+          stream: conversationProvider.streamConversation(),
+          initialData: userProvider.userData.conversations,
+          builder: (BuildContext context,
+              AsyncSnapshot<List<Conversation>> snapshot) {
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: snapshot.hasData ? snapshot.data.length : 0,
+              itemBuilder: ((context, index) {
+                return Text("${snapshot.data[index].cid}");
+              }),
+            );
+          },
+        ),
+        SizedBox(height: 8.0),
         Row(
           children: [
             Expanded(
@@ -138,29 +173,25 @@ class _ConversationScreen extends State<ConversationScreen> {
         ),
         SizedBox(height: 12.0),
         FutureBuilder<List<WithUserData>>(
-            future:
-                getWU(userProvider.uid, userProvider.userData.conversations),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: Text("loading convs"));
-              }
-              if (snapshot.hasError) {
-                return Center(child: Text("error: ${snapshot.error}"));
-              }
-              if (snapshot.data == null) {
-                return Center(child: Text("data is null"));
-              }
-              if (snapshot.data.isEmpty) {
-                return Center(child: Text("data is null"));
-              }
-              return ListView.separated(
+          future: getWU(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text("error: ${snapshot.error}"));
+            }
+            if (snapshot.data == null || snapshot.data.isEmpty) {
+              return Center(child: Text("data is null"));
+            }
+
+            return ListView.separated(
                 physics: NeverScrollableScrollPhysics(),
                 separatorBuilder: (context, index) => SizedBox(height: 8.0),
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
-                  debugPrint("length is ${snapshot.data.length}");
                   var withUser = snapshot.data[index];
                   return InkWell(
                     onTap: () {
@@ -178,32 +209,51 @@ class _ConversationScreen extends State<ConversationScreen> {
                           backgroundImage: NetworkImage(
                               withUser.picture ?? DEFAULT_USER_PICTURE)),
                       title: Text(withUser.fullName),
+                      subtitle: Text(
+                        conversationProvider.conversations[index].lastMessage !=
+                                null
+                            ? userProvider
+                                .userData.conversations[index].lastMessage.text
+                            : "",
+                        style: true
+                            //  userProvider.userData.conversations[index]
+                            // .lastMessage.didRead
+                            ? TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold)
+                            : TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
+                              ),
+                      ),
+                      trailing: Text(
+                          "${DateFormat.Hm().format(userProvider.userData.conversations[index].updatedDate)}"),
                     ),
                   );
-                },
-              );
-            })
+                });
+          },
+        )
       ],
     );
   }
 
-  Future<List<WithUserData>> getWU(
-      String uid, List<Conversation> conversations) async {
+  Future<List<WithUserData>> getWU() async {
+    final conversationProvider = Provider.of<ConversationProvider>(context);
+    var conversations = conversationProvider.conversations;
     List<WithUserData> list = [];
-
+    conversations.sort((a, b) =>
+        b.updatedDate.millisecond.compareTo(a.updatedDate.millisecond));
     for (var e in conversations) {
-      debugPrint("executed");
       WithUserData withUser;
-      if (e.user1 != Provider.of<UserProvider>(context, listen: false).uid) {
-        withUser = await CloudStore.getWithUser(e.user1);
+      if (e.user1 != conversationProvider.uid) {
+        withUser = await conversationProvider.getWithUser(e.user1);
         list.add(withUser);
       } else {
-        withUser = await CloudStore.getWithUser(e.user2);
+        withUser = await conversationProvider.getWithUser(e.user2);
         list.add(withUser);
-        debugPrint("${withUser.fullName}");
       }
     }
-    debugPrint("executed 1");
     return list;
   }
 }
