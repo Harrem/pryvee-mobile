@@ -8,6 +8,7 @@ import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/app_delegate_locale.dart/app_localization.dart';
 import 'package:pryvee/src/controllers/notification_controller.dart';
 import 'package:pryvee/src/providers_utils/auth_provider.dart';
+import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/locale_language_notifier.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pryvee/src/providers_utils/post_provider.dart';
@@ -111,6 +112,8 @@ class _MyApp extends State<MyApp> {
               create: (context) => UserProvider()),
           ChangeNotifierProvider<PostProvider>(
               create: (context) => PostProvider()),
+          ChangeNotifierProvider<ConversationProvider>(
+              create: (context) => ConversationProvider()),
         ],
         child: Consumer2<ThemeNotifier, SessionNotifier>(
           builder: (context, themeNotifier, sessionNotifier, _) =>
