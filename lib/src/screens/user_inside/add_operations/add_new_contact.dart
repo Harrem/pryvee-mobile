@@ -101,24 +101,41 @@ class _AddNewContactWidgetState extends State<AddNewContactWidget> {
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
+                              if (userProvider.userData.contacts
+                                  .contains(snapshot.data[index])) {
+                                //TODO: fix showing self contact
+                                // if (userProvider.userData.uid !=
+                                //     snapshot.data[index].uid) {
+                                //   debugPrint(
+                                //       "${userProvider.userData.uid != snapshot.data[index].uid}");
+                                //   return SizedBox();
+                                // }
+                                return SizedBox();
+                              }
                               return ListTile(
                                 leading: Icon(Icons.person),
                                 title: Text(snapshot.data[index].fullName),
                                 trailing: IconButton(
                                   onPressed: () async {
                                     if (!userProvider.userData.contacts
-                                        .contains(contacts[index])) {
-                                      userProvider.userData.contacts
-                                          .add(snapshot.data[index]);
-                                      debugPrint(userProvider
-                                          .userData.contacts.first
-                                          .toString());
-                                      await userProvider
-                                          .uploadUserData()
-                                          .then((value) => showToast(context,
-                                              "Added to trusted contacts"))
-                                          .catchError((e) => showToast(context,
-                                              "error while adding contact!"));
+                                        .contains(snapshot.data[index])) {
+                                      if (userProvider.userData.uid !=
+                                          snapshot.data[index].uid) {
+                                        userProvider.userData.contacts
+                                            .add(snapshot.data[index]);
+                                        debugPrint(userProvider
+                                            .userData.contacts.first
+                                            .toString());
+                                        await userProvider
+                                            .uploadUserData()
+                                            .then((value) => showToast(context,
+                                                "Added to trusted contacts"))
+                                            .catchError((e) => showToast(
+                                                context,
+                                                "error while adding contact!"));
+                                      } else {
+                                        showToast(context, "This is you!");
+                                      }
                                     } else {
                                       showToast(context, "Already Added");
                                     }
