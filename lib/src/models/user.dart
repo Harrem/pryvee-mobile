@@ -12,6 +12,7 @@ class UserData {
   String maritalStatus;
   bool isEmailValid;
   String uid;
+  String nuid;
   String fullName;
   String firstName;
   String lastName;
@@ -23,12 +24,13 @@ class UserData {
   String birthDate;
   String picture;
   List<UserData> contacts;
-  List<Conversation> conversations;
+  List<String> conversations;
   UserData(
       {this.addressModel,
       this.maritalStatus,
       this.isEmailValid,
       this.uid,
+      this.nuid,
       this.fullName,
       this.firstName,
       this.lastName,
@@ -71,6 +73,7 @@ class UserData {
         birthDate:
             (json['birthDate'] == null) ? '' : json['birthDate'].toString(),
         uid: (json['uid'] == null) ? '' : json['uid'].toString(),
+        nuid: (json['nuid'] == null) ? '' : json['nuid'].toString(),
         email: (json['email'] == null) ? '' : json['email'].toString(),
         phone: (json['phone'] == null) ? '' : json['phone'].toString(),
         contacts: (json['contacts'] == null)
@@ -78,14 +81,11 @@ class UserData {
             : (json['contacts'] as List<dynamic>)
                 .map((e) => UserData.fromJson(e))
                 .toList(),
-        conversations: List<Conversation>.from(
-          ((json['conversations'] == null)
-                  ? []
-                  : json['conversations'] as List<dynamic>)
-              .map<Conversation>(
-            (x) => Conversation.fromMap(x as Map<String, dynamic>),
-          ),
-        ),
+        conversations: (((json['conversations'] == null)
+                ? []
+                : json['conversations'] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList()),
       );
 
   UserData copyWith({
@@ -93,6 +93,7 @@ class UserData {
     String maritalStatus,
     bool isEmailValid,
     String uid,
+    String nuid,
     String fullName,
     String firstName,
     String lastName,
@@ -111,6 +112,7 @@ class UserData {
       maritalStatus: maritalStatus ?? this.maritalStatus,
       isEmailValid: isEmailValid ?? this.isEmailValid,
       uid: uid ?? this.uid,
+      nuid: nuid ?? this.nuid,
       fullName: fullName ?? this.fullName,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
@@ -132,6 +134,7 @@ class UserData {
       'maritalStatus': maritalStatus,
       'isEmailValid': isEmailValid,
       'uid': uid,
+      'nuid': nuid,
       'fullName': fullName,
       'firstName': firstName,
       'lastName': lastName,
@@ -143,7 +146,7 @@ class UserData {
       'birthDate': birthDate,
       'picture': picture,
       'contacts': contacts.map((e) => e.toMap()).toList(),
-      'conversations': conversations.map((e) => e.toMap()).toList(),
+      'conversations': conversations,
     };
   }
 
@@ -155,6 +158,7 @@ class UserData {
       maritalStatus: map['maritalStatus'] as String,
       isEmailValid: map['isEmailValid'] as bool,
       uid: map['uid'] as String,
+      nuid: map['nuid'] as String,
       fullName: map['fullName'] as String,
       firstName: map['firstName'] as String,
       lastName: map['lastName'] as String,
@@ -166,8 +170,7 @@ class UserData {
       birthDate: map['birthDate'] as String,
       picture: (map['picture'] as String) ?? DEFAULT_USER_PICTURE,
       contacts: List<UserData>.from(map['contacts'] as List<dynamic>),
-      conversations:
-          List<Conversation>.from(map['conversations'] as List<dynamic>),
+      conversations: map['conversations'] as List<String>,
     );
   }
 
@@ -186,6 +189,7 @@ class UserData {
         other.maritalStatus == maritalStatus &&
         other.isEmailValid == isEmailValid &&
         other.uid == uid &&
+        other.nuid == nuid &&
         other.fullName == fullName &&
         other.firstName == firstName &&
         other.lastName == lastName &&
@@ -206,6 +210,7 @@ class UserData {
         maritalStatus.hashCode ^
         isEmailValid.hashCode ^
         uid.hashCode ^
+        nuid.hashCode ^
         fullName.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^

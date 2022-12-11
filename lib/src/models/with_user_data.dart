@@ -3,11 +3,13 @@ import 'dart:convert';
 
 class WithUserData {
   String uid;
+  String nuid;
   String fullName;
   bool isActive;
   String picture;
   WithUserData({
     this.uid,
+    this.nuid,
     this.fullName,
     this.isActive,
     this.picture,
@@ -15,12 +17,14 @@ class WithUserData {
 
   WithUserData copyWith({
     String uid,
+    String nuid,
     String fullName,
     bool isActive,
     String profilePictureUrl,
   }) {
     return WithUserData(
       uid: uid ?? this.uid,
+      nuid: nuid ?? this.nuid,
       fullName: fullName ?? this.fullName,
       isActive: isActive ?? this.isActive,
       picture: profilePictureUrl ?? this.picture,
@@ -30,6 +34,7 @@ class WithUserData {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'uid': uid,
+      'nuid': nuid,
       'fullName': fullName,
       'isActive': isActive,
       'profilePictureUrl': picture,
@@ -39,6 +44,7 @@ class WithUserData {
   factory WithUserData.fromMap(Map<String, dynamic> map) {
     return WithUserData(
       uid: map['uid'] as String,
+      nuid: map['nuid'] as String,
       fullName: "${map['firstName']} ${map['lastName']}",
       isActive: map['isActive'] as bool,
       picture: map['picture'] as String,
@@ -52,7 +58,7 @@ class WithUserData {
 
   @override
   String toString() {
-    return 'WithUserData(uid: $uid, fullName: $fullName, isActive: $isActive, profilePictureUrl: $picture)';
+    return 'WithUserData(uid: $uid, nuid: $nuid fullName: $fullName, isActive: $isActive, profilePictureUrl: $picture)';
   }
 
   @override
@@ -60,6 +66,7 @@ class WithUserData {
     if (identical(this, other)) return true;
 
     return other.uid == uid &&
+        other.nuid == nuid &&
         other.fullName == fullName &&
         other.isActive == isActive &&
         other.picture == picture;
@@ -68,6 +75,7 @@ class WithUserData {
   @override
   int get hashCode {
     return uid.hashCode ^
+        nuid.hashCode ^
         fullName.hashCode ^
         isActive.hashCode ^
         picture.hashCode;

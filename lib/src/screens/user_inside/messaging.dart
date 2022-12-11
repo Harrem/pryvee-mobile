@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/loading_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 
-import '../../controllers/cloudStore.dart';
 import '../../models/conversation.dart';
 import '../../models/message.dart';
-import '../../models/user.dart';
 import '../../models/with_user_data.dart';
 
 class MessageScreen extends StatefulWidget {
@@ -19,9 +18,8 @@ class MessageScreen extends StatefulWidget {
 
 class _MessageScreenState extends State<MessageScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  CloudStore store = CloudStore();
   String message = "";
-  String cid;
+  Message lastMessage;
 
   void refresh() {
     setState(() {});
@@ -35,14 +33,15 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     final userActions = Provider.of<UserProvider>(context);
+    final conversationProvider = Provider.of<ConversationProvider>(context);
     return ChangeNotifierProvider<LoadingProvider>(
       create: (context) => LoadingProvider(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(widget.toUser.fullName),
         ),
-        body: checkConv(
-                    userActions.userData, userActions.uid, widget.toUser.uid) ==
+        body: checkConv(conversationProvider.conversations, userActions.uid,
+                    widget.toUser.uid) ==
                 null
             ? CreateConversationWidget(withUser: widget.toUser)
             : SizedBox(
@@ -50,18 +49,16 @@ class _MessageScreenState extends State<MessageScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Divider(height: 0.1),
                     Expanded(
                       child: SizedBox(
                         width: double.infinity,
                         child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 10),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
-                              color: Colors.grey[200]),
+                              color: Colors.transparent),
                           child: StreamBuilder(
-                            stream: CloudStore().readMessage(cid),
+                            stream: conversationProvider.readMessage(),
                             builder: (context,
                                 AsyncSnapshot<List<Message>> snapshot) {
                               if (snapshot.connectionState ==
@@ -72,8 +69,18 @@ class _MessageScreenState extends State<MessageScreen> {
                               if (snapshot.hasData) {
                                 if (snapshot.data != null) {
                                   var messages = snapshot.data;
+////////////////////////////////////////////////////////////////////
+
+                                  // conversationProvider.currentConv.updatedDate =
+                                  //     snapshot.data.first.sentDate;
+
+                                  // conversationProvider.currentConv.lastMessage =
+                                  //     snapshot.data.first;
+////////////////////////////////////////////////////////////////////
                                   debugPrint("${messages.isEmpty}");
                                   return ListView.builder(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
                                     shrinkWrap: true,
                                     reverse: true,
                                     itemCount: messages.length,
@@ -102,6 +109,9 @@ class _MessageScreenState extends State<MessageScreen> {
                         ),
                       ),
                     ),
+                    Divider(
+                      height: 0.1,
+                    ),
                     Container(
                       child: Padding(
                         padding: const EdgeInsets.all(10.0),
@@ -115,8 +125,10 @@ class _MessageScreenState extends State<MessageScreen> {
                                   onChanged: (value) {
                                     message = value;
                                   },
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     hintText: "write message",
+                                    fillColor: Colors.grey[200],
+                                    filled: true,
                                   ),
                                 ),
                               ),
@@ -130,8 +142,12 @@ class _MessageScreenState extends State<MessageScreen> {
                                     icon: const Icon(Icons.send),
                                     onPressed: () {
                                       if (message.isNotEmpty) {
-                                        store.writeMessage(
-                                            message, cid, userActions.uid);
+                                        conversationProvider.sendMessage(
+                                            message,
+                                            userActions.uid,
+                                            userActions.userData.fullName,
+                                            widget.toUser.nuid,
+                                            userActions.userData.picture);
                                         _formKey.currentState.reset();
                                       }
                                       setState(() {
@@ -144,6 +160,7 @@ class _MessageScreenState extends State<MessageScreen> {
                                           );
                                         }
                                       });
+                                      message = "";
                                     },
                                   ),
                                 ),
@@ -160,17 +177,18 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 
-  Conversation checkConv(UserData userData, String uid1, String uid2) {
+  Conversation checkConv(List<Conversation> convs, String uid1, String uid2) {
     Conversation conversation;
 
-    for (var conv in userData.conversations) {
+    for (var conv in convs) {
       if (conv.user1 == uid1 && conv.user2 == uid2) {
         conversation = conv;
       } else if (conv.user2 == uid1 && conv.user1 == uid2) {
         conversation = conv;
       }
     }
-    cid = conversation?.cid;
+
+    Provider.of<ConversationProvider>(context).currentConv = conversation;
     return conversation;
   }
 }
@@ -182,6 +200,7 @@ class CreateConversationWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final loadingProvider = Provider.of<LoadingProvider>(context);
     final userActions = Provider.of<UserProvider>(context);
+    final conversationProvider = Provider.of<ConversationProvider>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -222,23 +241,22 @@ class CreateConversationWidget extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () async {
               loadingProvider.start();
-              debugPrint("started loading indicator");
-              await userActions
-                  .createConversation(userActions.uid, withUser.uid)
+
+              await conversationProvider
+                  .createConversation(withUser.uid)
                   .then((value) {
                 debugPrint("Conversation Created");
                 debugPrint("Conversation id: ${value.cid}");
               });
 
-              debugPrint("stopped loading indicator");
               loadingProvider.stop();
             },
             child: loadingProvider.isLoading
                 ? const SizedBox(
-                    width: 20,
                     child: CircularProgressIndicator(
-                      color: Colors.red,
-                    ))
+                      color: Colors.white,
+                    ),
+                  )
                 : const Text("Start Conversation"),
           ),
         ),
@@ -289,7 +307,7 @@ class ChatBubbleOther extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundImage: NetworkImage(imageUrl),
-              radius: 30,
+              radius: 15,
             ),
             const SizedBox(width: 15),
             Container(

@@ -4,9 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/models/user.dart';
-
-import '../models/conversation.dart';
 
 class UserProvider extends ChangeNotifier {
   UserData userData;
@@ -26,7 +25,10 @@ class UserProvider extends ChangeNotifier {
     print(documentSnapshot.data());
     if (documentSnapshot != null || documentSnapshot.exists) {
       userData = UserData.fromJson(documentSnapshot.data());
-      // debugPrint(userData.toJson());
+      if (userData.nuid != await getOneSignalUserId()) {
+        userData.nuid = await getOneSignalUserId();
+        updateUserData();
+      }
       return userData;
     } else {
       debugPrint("Error while initializing user data");

@@ -27,10 +27,6 @@ class _ConversationScreen extends State<ConversationScreen> {
 
   @override
   void initState() {
-    final p = Provider.of<ConversationProvider>(context, listen: false);
-    p.conversations = Provider.of<UserProvider>(context, listen: false)
-        .userData
-        .conversations;
     if (mounted) {}
     super.initState();
   }
@@ -121,20 +117,15 @@ class _ConversationScreen extends State<ConversationScreen> {
         ),
         SizedBox(height: 8.0),
         ElevatedButton(
-            onPressed: () {
-              final p =
-                  Provider.of<ConversationProvider>(context, listen: false);
-              var cids = userProvider.userData.conversations
-                  .map((e) => e.cid)
-                  .toList();
-              p.conversations = userProvider.userData.conversations;
-              debugPrint("${p.conversations.first}");
-              p.readMessage(p.conversations.first.cid);
-            },
-            child: Text("Test")),
+          onPressed: () {
+            final p = Provider.of<ConversationProvider>(context, listen: false);
+            debugPrint("${p.conversations.first}");
+          },
+          child: Text("Test"),
+        ),
         StreamBuilder(
           stream: conversationProvider.streamConversation(),
-          initialData: userProvider.userData.conversations,
+          initialData: conversationProvider.conversations,
           builder: (BuildContext context,
               AsyncSnapshot<List<Conversation>> snapshot) {
             return ListView.builder(
@@ -195,6 +186,8 @@ class _ConversationScreen extends State<ConversationScreen> {
                   var withUser = snapshot.data[index];
                   return InkWell(
                     onTap: () {
+                      conversationProvider.currentConv =
+                          conversationProvider.conversations[index];
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -209,26 +202,29 @@ class _ConversationScreen extends State<ConversationScreen> {
                           backgroundImage: NetworkImage(
                               withUser.picture ?? DEFAULT_USER_PICTURE)),
                       title: Text(withUser.fullName),
-                      subtitle: Text(
-                        conversationProvider.conversations[index].lastMessage !=
-                                null
-                            ? userProvider
-                                .userData.conversations[index].lastMessage.text
-                            : "",
-                        style: true
-                            //  userProvider.userData.conversations[index]
-                            // .lastMessage.didRead
-                            ? TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold)
-                            : TextStyle(
-                                color: Colors.black,
-                                fontSize: 14,
-                              ),
-                      ),
+                      subtitle: FutureBuilder<Message>(
+                          future: conversationProvider.getLastMessage(index),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Text("");
+                            }
+                            debugPrint("has data: ${snapshot.data}");
+                            return Text(
+                              snapshot.hasData ? snapshot.data.text : "",
+                              style: !snapshot.data.didRead
+                                  ? TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold)
+                                  : TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                    ),
+                            );
+                          }),
                       trailing: Text(
-                          "${DateFormat.Hm().format(userProvider.userData.conversations[index].updatedDate)}"),
+                          "${DateFormat.Hm().format(conversationProvider.conversations[index].updatedDate)}"),
                     ),
                   );
                 });

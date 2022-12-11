@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/data/data_source_local.dart';
+import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/screens/user_inside/conversation_screen.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:pryvee/src/utils/notification_services.dart';
 import 'package:pryvee/src/widgets/UserAvatarButtonWidget.dart';
 import 'package:pryvee/src/screens/user_inside/account.dart';
 import 'package:pryvee/src/models/commun_select_model.dart';
@@ -44,6 +47,8 @@ class _UserTabsWidget extends State<UserTabsWidget>
     Provider.of<UserProvider>(context, listen: false)
         .initUserData()
         .then((user) {
+      final p = Provider.of<ConversationProvider>(context, listen: false);
+      p.initConv();
       if (this.mounted)
         setState(() {
           isLoading = false;
@@ -111,6 +116,13 @@ class _UserTabsWidget extends State<UserTabsWidget>
             AccountWidget(),
           ],
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            // Navigator.push(context,
+            //     MaterialPageRoute(builder: (context) => AddPhoneScreen()));
+          },
+          child: Icon(Icons.phone),
+        ),
         bottomNavigationBar: SafeArea(
           child: CurvedNavigationBar(
             buttonBackgroundColor: APP_COLOR,
@@ -150,5 +162,49 @@ class _UserTabsWidget extends State<UserTabsWidget>
         ),
       ),
     );
+  }
+}
+
+class AddPhoneScreen extends StatelessWidget {
+  AddPhoneScreen({Key key}) : super(key: key);
+  String phoneNumber = "";
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Add Phone Number")),
+      body: Column(children: [
+        SizedBox(height: 20),
+        TextField(
+          decoration: InputDecoration(labelText: "Phone number"),
+          onChanged: (value) => phoneNumber = value,
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+            onPressed: () async {
+              debugPrint("Verifications starts");
+              FirebaseAuth.instance.verifyPhoneNumber(
+                  phoneNumber: phoneNumber,
+                  verificationCompleted: (val) {
+                    debugPrint("Verification Completed");
+                    return val;
+                  },
+                  verificationFailed: (e) {
+                    debugPrint(e.code);
+                  },
+                  codeSent: (str, c) {
+                    debugPrint(str);
+                    debugPrint("Code is: " + c.toString());
+                  },
+                  codeAutoRetrievalTimeout: (v) {
+                    debugPrint("Code Timeout!");
+                  });
+            },
+            child: Text("Next"))
+      ]),
+    );
+  }
+
+  void print(String text) {
+    debugPrint(text);
   }
 }
