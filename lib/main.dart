@@ -29,12 +29,24 @@ import 'package:pryvee/src/utils/locator.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   setupLocator();
+
+  //Remove this method to stop OneSignal Debugging
+  OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+
+  OneSignal.shared.setAppId(kAppId);
+  var status = await OneSignal.shared.getDeviceState();
+  addOneSignalUserId(status.userId);
+// The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
+  OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
+    print("Accepted permission: $accepted");
+  });
 
   await AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
