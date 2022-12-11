@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+/// one signal app id
+const kAppId = "4a4baf11-2bfb-408a-bebc-c57d0e40f223";
+
 // COLORS
 const Color APP_COLOR = Color(0xFFE63946);
 
