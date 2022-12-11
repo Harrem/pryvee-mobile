@@ -43,6 +43,7 @@ dependencies:
   permission_handler: ^10.2.0
   awesome_notifications: ^0.6.13
   flutter_screenutil: ^5.6.0
+  onesignal_flutter: ^3.5.0
 
   flutter_localizations:
     sdk: flutter
