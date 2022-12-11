@@ -50,6 +50,18 @@ void addLocalLocaleLanguageToSP(String localLocaleLanguage) async {
   sharedPreferences.setString("localLocaleLanguage", localLocaleLanguage);
 }
 
+void addOneSignalUserId(String nuid) async {
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  sharedPreferences.setString("nuid", nuid);
+}
+
+Future<String> getOneSignalUserId() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  //Return String
+  String stringValue = prefs.getString('nuid');
+  return stringValue;
+}
+
 Future<LatLng> getLocalLocationFromSP() async {
   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   String string = sharedPreferences.getString("localLocation");

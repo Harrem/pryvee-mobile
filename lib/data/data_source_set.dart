@@ -73,6 +73,7 @@ class DataSourceSet {
     user.updateDisplayName("$firstName $lastName");
     UserData userData = UserData(
       uid: user.uid,
+      nuid: await getOneSignalUserId(),
       email: email,
       firstName: firstName,
       lastName: lastName,
