@@ -12,10 +12,15 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class LivePostItemWidget extends StatefulWidget {
-  LivePostItemWidget({Key key, @required this.post, @required this.userData})
+  LivePostItemWidget(
+      {Key key,
+      @required this.post,
+      @required this.userData,
+      this.notifyParent})
       : super(key: key);
-  Post post;
-  UserData userData;
+  final Post post;
+  final UserData userData;
+  final Function() notifyParent;
 
   @override
   State<LivePostItemWidget> createState() => _LivePostItemWidgetState();
@@ -23,8 +28,13 @@ class LivePostItemWidget extends StatefulWidget {
 
 class _LivePostItemWidgetState extends State<LivePostItemWidget> {
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context);
     return CommunChipWidget(
       color: Theme.of(context).focusColor.withOpacity(0.4),
       borderRadiusGeometry: BorderRadius.circular(8.0),
@@ -321,8 +331,8 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     SizedBox(width: 4.0),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () {
-                          showDialog(
+                        onTap: () async {
+                          bool del = await showDialog(
                               context: context,
                               builder: (context) {
                                 return Dialog(
@@ -352,17 +362,19 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                                               child: Text("Keep Watch"),
                                             ),
                                             ElevatedButton(
-                                              onPressed: () {
-                                                Provider.of<PostProvider>(
+                                              onPressed: () async {
+                                                await Provider.of<PostProvider>(
                                                         context,
                                                         listen: false)
-                                                    .deletePost(widget.post)
-                                                    .then((value) => showToast(
-                                                        context,
-                                                        "Post Removed!"));
+                                                    .removeFromLive(widget.post)
+                                                    .then((value) {
+                                                  showToast(context,
+                                                      "Post deactivated!");
+                                                });
+                                                widget.notifyParent();
                                                 Navigator.pop(context);
                                               },
-                                              child: Text("Remove"),
+                                              child: Text("Deactivate"),
                                             ),
                                           ],
                                         )

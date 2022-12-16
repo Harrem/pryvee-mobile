@@ -21,22 +21,17 @@ class PostsWidget extends StatefulWidget {
 }
 
 class _PostsWidgetState extends State<PostsWidget> {
-  TextEditingController searchTextEditingController =
-      new TextEditingController();
-  DataSourceGet apiGet = DataSourceGet();
-  DataSourceSet apiSet = DataSourceSet();
-  List<Post> postsList;
+  var searchTextEditingController = new TextEditingController();
 
-  Future<void> getCurrentUserPostsAPI() => apiGet
-      .getCurrentUserPostsAPI()
-      .then((value) => setState(() => this.postsList = value));
+  refresh() {
+    setState(() {});
+    debugPrint("view Refreshed");
+  }
 
+//TODO: fix refreshing bug
   @override
-  void initState() {
-    super.initState();
-    if (mounted) {
-      getCurrentUserPostsAPI();
-    }
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -50,8 +45,12 @@ class _PostsWidgetState extends State<PostsWidget> {
             searchTextEditingController: this.searchTextEditingController),
         SizedBox(height: 8.0),
         CommunChipWidget(
-          onTap: () => Navigator.push(context,
-              MaterialPageRoute(builder: (context) => AddNewPosWidget())),
+          onTap: () async => await Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => AddNewPosWidget(
+                        refreshParent: refresh,
+                      ))),
           edgeInsetsGeometry:
               EdgeInsets.symmetric(vertical: 6.0, horizontal: 12.0),
           borderRadiusGeometry: BorderRadius.circular(8.0),
@@ -101,7 +100,9 @@ class _PostsWidgetState extends State<PostsWidget> {
           itemCount: postProvider.posts.length,
           itemBuilder: (context, index) {
             return PostItemWidget(
-                post: postProvider.posts[index], user: userProvider.userData);
+                post: postProvider.posts[index],
+                user: userProvider.userData,
+                refreshTheView: refresh);
           },
         )
       ],

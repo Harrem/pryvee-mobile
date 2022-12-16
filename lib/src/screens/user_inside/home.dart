@@ -16,14 +16,17 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   TextEditingController searchTextEditingController = TextEditingController();
-  List<Post> livePosts;
   bool isLoading = true;
-
   DataSourceGet apiGet = DataSourceGet();
   String localTimeZone;
 
   Future<void> getLocalTimeZone() async {
     localTimeZone = await AwesomeNotifications().getLocalTimeZoneIdentifier();
+  }
+
+  refresh() {
+    setState(() {});
+    debugPrint("Refreshed");
   }
 
   @override
@@ -33,7 +36,6 @@ class _HomeWidgetState extends State<HomeWidget> {
     Provider.of<PostProvider>(context, listen: false)
         .fetchAllPostes(Provider.of<UserProvider>(context, listen: false).uid)
         .whenComplete(() {
-      livePosts = Provider.of<PostProvider>(context, listen: false).livePosts;
       isLoading = false;
       if (mounted) setState(() {});
     });
@@ -43,7 +45,6 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
     return isLoading
         ? Center(
             child: CircularProgressIndicator(),
@@ -90,7 +91,7 @@ class _HomeWidgetState extends State<HomeWidget> {
               // ),
               SizedBox(height: 12.0),
               SizedBox(height: 12.0),
-              livePosts.length == 0
+              Provider.of<PostProvider>(context).livePosts.length == 0
                   ? Center(
                       child: Text("You don't have any posts yet"),
                     )
@@ -119,21 +120,27 @@ class _HomeWidgetState extends State<HomeWidget> {
                       ],
                     ),
               SizedBox(height: 12.0),
-              livePosts != null
+              Provider.of<PostProvider>(context).livePosts != null
                   ? ListView.separated(
                       physics: NeverScrollableScrollPhysics(),
                       separatorBuilder: (context, index) =>
                           SizedBox(height: 8.0),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: livePosts.length,
+                      itemCount:
+                          Provider.of<PostProvider>(context).livePosts.length,
                       itemBuilder: (context, index) {
-                        if (livePosts.isNotEmpty)
-                          livePosts.forEach((livePost) async =>
-                              await checkNotification(livePost));
+                        if (Provider.of<PostProvider>(context)
+                            .livePosts
+                            .isNotEmpty)
+                          Provider.of<PostProvider>(context).livePosts.forEach(
+                              (livePost) async =>
+                                  await checkNotification(livePost));
                         return LivePostItemWidget(
-                          post: livePosts[index],
-                          userData: userProvider.userData,
+                          post: Provider.of<PostProvider>(context)
+                              .livePosts[index],
+                          userData: Provider.of<UserProvider>(context).userData,
+                          notifyParent: refresh,
                         );
                       },
                     )

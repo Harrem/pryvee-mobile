@@ -5,8 +5,8 @@ import 'package:http/http.dart';
 import '../../data/data_source_const.dart';
 
 class NotificationServices {
-  Future<Response> sendNotification(List<String> tokenIdList, String contents,
-      String heading, String img) async {
+  static Future<Response> sendNotification(List<String> tokenIdList,
+      String contents, String heading, String img) async {
     return await post(
       Uri.parse('https://onesignal.com/api/v1/notifications'),
       headers: <String, String>{
@@ -31,8 +31,8 @@ class NotificationServices {
         "contents": {"en": contents},
 
         "buttons": [
-          {"id": "1", "text": "Reply", "icon": "ic_menu_share"},
-          {"id": "2", "text": "Dismiss", "icon": "ic_menu_send"}
+          {"id": "reply", "text": "Reply", "icon": "ic_menu_share"},
+          {"id": "dismiss", "text": "Dismiss", "icon": "ic_menu_send"}
         ]
       }),
     );

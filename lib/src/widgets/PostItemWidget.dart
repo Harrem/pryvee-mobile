@@ -10,9 +10,12 @@ import '../models/user.dart';
 
 // ignore: must_be_immutable
 class PostItemWidget extends StatelessWidget {
-  PostItemWidget({Key key, this.post, this.user}) : super(key: key);
+  PostItemWidget({Key key, this.post, this.user, this.refreshTheView})
+      : super(key: key);
   UserData user;
   Post post;
+  final Function refreshTheView;
+
   @override
   Widget build(BuildContext context) {
     final postProvider = Provider.of<PostProvider>(context);
@@ -183,7 +186,9 @@ class PostItemWidget extends StatelessWidget {
                       child: CircleAvatar(
                         backgroundColor: Theme.of(context).focusColor,
                         backgroundImage: NetworkImage(
-                            post.pictureUrl ?? DEFAULT_USER_PICTURE),
+                            this.post.pictureUrl == null
+                                ? this.post.pictureUrl
+                                : DEFAULT_USER_PICTURE),
                       ),
                     ),
                     SizedBox(width: 8.0),
@@ -270,13 +275,15 @@ class PostItemWidget extends StatelessWidget {
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
-                          await postProvider
+                          await Provider.of<PostProvider>(context,
+                                  listen: false)
                               .deletePost(post)
-                              .then((value) => showToast(
-                                  context, "Post removed successfully"))
-                              .catchError((e) {
+                              .then((value) {
+                            showToast(context, "Post removed successfully");
+                          }).catchError((e) {
                             showToast(context, "Error: $e");
                           });
+                          refreshTheView();
                         },
                         child: CommunChipWidget(
                           edgeInsetsGeometry: EdgeInsets.symmetric(

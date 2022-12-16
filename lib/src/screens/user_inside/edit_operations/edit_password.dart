@@ -6,7 +6,6 @@ import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_set.dart';
 import 'package:pryvee/config/ui_icons.dart';
-import 'package:pryvee/src/models/user.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -204,15 +203,15 @@ class _EditPasswordWidget extends State<EditPasswordWidget> {
                         : () {
                             setState(() => this.isLoading = !this.isLoading);
                             user
-                                .updatePassword(this.checkPassword)
+                                .updatePassword(
+                                    this.checkOldPassword, this.checkPassword)
                                 .then((value) {
                               setState(() => this.isLoading = !this.isLoading);
                               showToast(
-                                  context, "Password updated uccessfully");
+                                  context, "Password updated successfully");
                               Navigator.of(context).pop();
                             }).catchError((onError) {
-                              showToast(context,
-                                  "An error occurred, please try again later.");
+                              showToast(context, "$onError");
                               setState(() => this.isLoading = !this.isLoading);
                             });
                           },

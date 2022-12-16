@@ -15,7 +15,6 @@ import 'package:pryvee/data/data_source_set.dart';
 import 'package:pryvee/data/data_source_get.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:pryvee/config/ui_icons.dart';
-import 'package:pryvee/src/models/user.dart';
 import 'package:flutter/material.dart';
 // ignore_for_file: must_be_immutable
 import 'dart:io';
@@ -198,23 +197,6 @@ class _AccountWidgetState extends State<AccountWidget> {
           ),
         ),
         SizedBox(height: 10.0),
-        CommunTextButtonWidget(
-          color: APP_COLOR,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              8.0,
-            ),
-          ),
-          onPressed: () {},
-          child: Text(
-            'Share my profile',
-            style: Theme.of(context).textTheme.bodyText1.merge(
-                  TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-          ),
-        ),
         SizedBox(height: 10.0),
         CommunChipWidget(
           onTap: () => Navigator.push(
@@ -338,35 +320,6 @@ class _AccountWidgetState extends State<AccountWidget> {
           ),
         ),
         SizedBox(height: 6.0),
-        CommunChipWidget(
-          color: Theme.of(context).focusColor.withOpacity(0.4),
-          borderRadiusGeometry: BorderRadius.circular(100.0),
-          edgeInsetsGeometry: EdgeInsets.all(16.0),
-          onTap: () =>
-              Navigator.of(context).pushNamed('/UserTabs', arguments: 1),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                UiIcons.layers,
-                size: 16.0,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'My post',
-                  style: Theme.of(context).textTheme.bodyText1,
-                ),
-              ),
-              SizedBox(width: 10),
-              Icon(
-                Icons.chevron_right_rounded,
-                size: 16.0,
-                color: Colors.grey.withOpacity(0.8),
-              ),
-            ],
-          ),
-        ),
         SizedBox(height: 6.0),
         CommunChipWidget(
           color: Theme.of(context).focusColor.withOpacity(0.4),
