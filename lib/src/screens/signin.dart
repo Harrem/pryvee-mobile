@@ -222,7 +222,14 @@ class _SignInWidget extends State<SignInWidget> {
                                             setState(() {});
                                             await context
                                                 .read<UserProvider>()
-                                                .initUserData();
+                                                .initUserData()
+                                                .then((value) async =>
+                                                    await context
+                                                        .read<UserProvider>()
+                                                        .updateUserDataWithMap({
+                                                      'nuid':
+                                                          await getOneSignalUserId()
+                                                    }));
                                             this.isLoading = !this.isLoading;
                                             Navigator.of(context)
                                                 .pushNamedAndRemoveUntil(

@@ -28,8 +28,8 @@ import '../../../providers_utils/user_data_provider.dart';
 
 // ignore: must_be_immutable
 class AddNewPosWidget extends StatefulWidget {
-  AddNewPosWidget({Key key}) : super(key: key);
-
+  AddNewPosWidget({Key key, @required this.refreshParent}) : super(key: key);
+  final Function refreshParent;
   @override
   _AddNewPosWidget createState() => _AddNewPosWidget();
 }
@@ -747,6 +747,8 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                   ],
                 );
                 showToast(context, "Post Created!");
+                //TODO: refresh the view after poping
+                widget.refreshParent();
                 Navigator.pop(context);
               }).catchError((e) {
                 showToast(context, e);

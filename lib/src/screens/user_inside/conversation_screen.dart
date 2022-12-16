@@ -32,14 +32,19 @@ class _ConversationScreen extends State<ConversationScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
     final conversationProvider = Provider.of<ConversationProvider>(context);
     return ListView(
       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       children: [
-        CustomSearchBarWidget(
-            searchTextEditingController: this.searchTextEditingController),
+        // CustomSearchBarWidget(
+        //     searchTextEditingController: this.searchTextEditingController),
         SizedBox(height: 8.0),
         CommunChipWidget(
           onTap: () {
@@ -116,27 +121,28 @@ class _ConversationScreen extends State<ConversationScreen> {
           ),
         ),
         SizedBox(height: 8.0),
-        ElevatedButton(
-          onPressed: () {
-            final p = Provider.of<ConversationProvider>(context, listen: false);
-            debugPrint("${p.conversations.first}");
-          },
-          child: Text("Test"),
-        ),
-        StreamBuilder(
-          stream: conversationProvider.streamConversation(),
-          initialData: conversationProvider.conversations,
-          builder: (BuildContext context,
-              AsyncSnapshot<List<Conversation>> snapshot) {
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: snapshot.hasData ? snapshot.data.length : 0,
-              itemBuilder: ((context, index) {
-                return Text("${snapshot.data[index].cid}");
-              }),
-            );
-          },
-        ),
+        // ElevatedButton(
+        //   onPressed: () {
+        //     final p = Provider.of<ConversationProvider>(context, listen: false);
+        //     debugPrint("${p.conversations.first}");
+        //   },
+        //   child: Text("Test"),
+        // ),
+        // StreamBuilder(
+
+        //   stream: conversationProvider.streamConversation(),
+        //   initialData: conversationProvider.conversations,
+        //   builder: (BuildContext context,
+        //       AsyncSnapshot<List<Conversation>> snapshot) {
+        //     return ListView.builder(
+        //       shrinkWrap: true,
+        //       itemCount: snapshot.hasData ? snapshot.data.length : 0,
+        //       itemBuilder: ((context, index) {
+        //         return Text("${snapshot.data[index].cid}");
+        //       }),
+        //     );
+        //   },
+        // ),
         SizedBox(height: 8.0),
         Row(
           children: [
@@ -173,7 +179,7 @@ class _ConversationScreen extends State<ConversationScreen> {
               return Center(child: Text("error: ${snapshot.error}"));
             }
             if (snapshot.data == null || snapshot.data.isEmpty) {
-              return Center(child: Text("data is null"));
+              return Center(child: Text("Start conversation with friends"));
             }
 
             return ListView.separated(
@@ -195,7 +201,9 @@ class _ConversationScreen extends State<ConversationScreen> {
                             toUser: withUser,
                           ),
                         ),
-                      );
+                      ).then((value) {
+                        setState(() {});
+                      });
                     },
                     child: ListTile(
                       leading: CircleAvatar(
@@ -203,28 +211,41 @@ class _ConversationScreen extends State<ConversationScreen> {
                               withUser.picture ?? DEFAULT_USER_PICTURE)),
                       title: Text(withUser.fullName),
                       subtitle: FutureBuilder<Message>(
-                          future: conversationProvider.getLastMessage(index),
+                          future:
+                              conversationProvider.getLastMessage(withUser.uid),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Text("");
+                              return Text("",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold));
+                            }
+                            if (snapshot.data == null) {
+                              return Text("you started conversations");
                             }
                             debugPrint("has data: ${snapshot.data}");
                             return Text(
                               snapshot.hasData ? snapshot.data.text : "",
-                              style: !snapshot.data.didRead
+                              style: snapshot.data.fromUid == userProvider.uid
                                   ? TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold)
-                                  : TextStyle(
                                       color: Colors.grey,
                                       fontSize: 14,
-                                    ),
+                                    )
+                                  : !snapshot.data.didRead
+                                      ? TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold)
+                                      : TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 14,
+                                        ),
                             );
                           }),
-                      trailing: Text(
-                          "${DateFormat.Hm().format(conversationProvider.conversations[index].updatedDate)}"),
+                      // trailing: Text(
+                      //     "${DateFormat.Md().format(conversationProvider.conversations[index].updatedDate)}"),
                     ),
                   );
                 });
@@ -244,10 +265,10 @@ class _ConversationScreen extends State<ConversationScreen> {
       WithUserData withUser;
       if (e.user1 != conversationProvider.uid) {
         withUser = await conversationProvider.getWithUser(e.user1);
-        list.add(withUser);
+        if (!list.contains(withUser)) list.add(withUser);
       } else {
         withUser = await conversationProvider.getWithUser(e.user2);
-        list.add(withUser);
+        if (!list.contains(withUser)) list.add(withUser);
       }
     }
     return list;

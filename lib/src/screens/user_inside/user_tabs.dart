@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/data/data_source_local.dart';
@@ -5,6 +6,7 @@ import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/screens/user_inside/conversation_screen.dart';
 import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:pryvee/src/utils/commun_mix_utility.dart';
 import 'package:pryvee/src/utils/notification_services.dart';
 import 'package:pryvee/src/widgets/UserAvatarButtonWidget.dart';
 import 'package:pryvee/src/screens/user_inside/account.dart';
@@ -93,21 +95,22 @@ class _UserTabsWidget extends State<UserTabsWidget>
                 ),
           ),
           actions: <Widget>[
-            IconButton(
-                onPressed: () {
-                  pryveeSignOut(context);
-                },
-                icon: Icon(
-                  Icons.output_rounded,
-                  color: Colors.black,
-                )),
             isLoading
-                ? UserAvatarButtonWidget()
-                : UserAvatarButtonWidget(
-                    profileUrl: userProvider.userData.picture)
+                ? Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: CircleAvatar(
+                        backgroundImage: NetworkImage(DEFAULT_USER_PICTURE)),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: CircleAvatar(
+                        backgroundImage:
+                            NetworkImage(userProvider.userData.picture)),
+                  )
           ],
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           controller: tabController,
           children: [
             HomeWidget(),
@@ -116,13 +119,13 @@ class _UserTabsWidget extends State<UserTabsWidget>
             AccountWidget(),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-            // Navigator.push(context,
-            //     MaterialPageRoute(builder: (context) => AddPhoneScreen()));
-          },
-          child: Icon(Icons.phone),
-        ),
+        // floatingActionButton: FloatingActionButton(
+        //   onPressed: () async {
+        //     Navigator.push(
+        //         context, MaterialPageRoute(builder: (context) => Register()));
+        //   },
+        //   child: Icon(Icons.phone),
+        // ),
         bottomNavigationBar: SafeArea(
           child: CurvedNavigationBar(
             buttonBackgroundColor: APP_COLOR,
@@ -165,46 +168,476 @@ class _UserTabsWidget extends State<UserTabsWidget>
   }
 }
 
-class AddPhoneScreen extends StatelessWidget {
-  AddPhoneScreen({Key key}) : super(key: key);
-  String phoneNumber = "";
+class Register extends StatefulWidget {
+  const Register({Key key}) : super(key: key);
+
+  @override
+  _RegisterState createState() => _RegisterState();
+}
+
+class _RegisterState extends State<Register> {
+  var phoneNoController = TextEditingController();
+  var hasError = true;
+  Country country = CountryService().findByName('United States');
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Add Phone Number")),
-      body: Column(children: [
-        SizedBox(height: 20),
-        TextField(
-          decoration: InputDecoration(labelText: "Phone number"),
-          onChanged: (value) => phoneNumber = value,
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Color(0xfff7f6fb),
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 32,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 18,
+                ),
+                Container(
+                  width: 200,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Image.asset(
+                    'img/illustration-2.png',
+                  ),
+                ),
+                SizedBox(
+                  height: 24,
+                ),
+                Text(
+                  'Registration',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(
+                  "Add your phone number. we'll send you a verification code so we know you're real",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black38,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 28,
+                ),
+                Container(
+                  padding: EdgeInsets.all(28),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: phoneNoController,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 10,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.black12),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          prefix: Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8),
+                            child: InkWell(
+                              child: country != null
+                                  ? Text(country.flagEmoji)
+                                  : Text("🏳"),
+                              onTap: () {
+                                country;
+                                showCountryPicker(
+                                    showPhoneCode: true,
+                                    context: context,
+                                    onSelect: (c) {
+                                      setState(() {
+                                        country = c;
+                                      });
+                                    });
+                              },
+                            ),
+                          ),
+                          suffixIcon: Icon(
+                            hasError ? Icons.close_rounded : Icons.check_circle,
+                            color: hasError ? Colors.red : Colors.green,
+                            size: 32,
+                          ),
+                        ),
+                        onChanged: ((value) {
+                          if (value.length != 10) {
+                            setState(() {
+                              hasError = true;
+                            });
+                          } else {
+                            setState(() {
+                              hasError = false;
+                            });
+                          }
+                        }),
+                      ),
+                      SizedBox(
+                        height: 22,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (phoneNoController.value.text.isNotEmpty) {
+                              String phoneNo =
+                                  "+${country.phoneCode}${phoneNoController.text.trim()}";
+                              debugPrint("PhoneNo: " + phoneNo);
+                              // await verifyPhoenNo(
+                              //         "+964${phoneNoController.text.trim()}")
+                              //     .then((value) => debugPrint("Code Sent"));
+
+                              await FirebaseAuth.instance.verifyPhoneNumber(
+                                  phoneNumber: phoneNo,
+                                  timeout: Duration(seconds: 100),
+                                  verificationCompleted:
+                                      (phoneCredential) async {
+                                    await FirebaseAuth.instance.currentUser
+                                        .linkWithCredential(phoneCredential)
+                                        .then((value) => debugPrint(
+                                            "Phone number linked to account"))
+                                        .catchError((e) => debugPrint(
+                                            "linking failed with error: $e"));
+                                    debugPrint("Verification Completed");
+                                  },
+                                  verificationFailed: (e) {
+                                    debugPrint("failed: " + e.code);
+                                  },
+                                  codeSent: (verificationId, resendToken) {
+                                    debugPrint("resendToken is: " +
+                                        resendToken.toString());
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            Otp(vid: verificationId),
+                                      ),
+                                    );
+                                  },
+                                  codeAutoRetrievalTimeout: (v) {
+                                    debugPrint("Code Timeout!");
+                                  });
+                              // );
+                            } else {
+                              showToast(context, "Wrong Phone Number!");
+                            }
+                          },
+                          style: ButtonStyle(
+                            foregroundColor:
+                                MaterialStateProperty.all<Color>(Colors.white),
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.purple),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(24.0),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(14.0),
+                            child: Text(
+                              'Send',
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-        SizedBox(height: 20),
-        ElevatedButton(
-            onPressed: () async {
-              debugPrint("Verifications starts");
-              FirebaseAuth.instance.verifyPhoneNumber(
-                  phoneNumber: phoneNumber,
-                  verificationCompleted: (val) {
-                    debugPrint("Verification Completed");
-                    return val;
-                  },
-                  verificationFailed: (e) {
-                    debugPrint(e.code);
-                  },
-                  codeSent: (str, c) {
-                    debugPrint(str);
-                    debugPrint("Code is: " + c.toString());
-                  },
-                  codeAutoRetrievalTimeout: (v) {
-                    debugPrint("Code Timeout!");
-                  });
-            },
-            child: Text("Next"))
-      ]),
+      ),
     );
   }
 
-  void print(String text) {
-    debugPrint(text);
+  Future<PhoneAuthProvider> verifyPhoenNo(String phoneNo) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNo,
+        timeout: Duration(seconds: 90),
+        verificationCompleted: (val) {
+          debugPrint("Verification Completed");
+          return val;
+        },
+        verificationFailed: (e) {
+          debugPrint(e.code);
+        },
+        codeSent: (str, c) {
+          debugPrint(str);
+          debugPrint("Code is: " + c.toString());
+        },
+        codeAutoRetrievalTimeout: (v) {
+          debugPrint("Code Timeout!");
+        });
+    return null;
+  }
+}
+
+class Otp extends StatefulWidget {
+  const Otp({Key key, @required this.vid}) : super(key: key);
+  final String vid;
+  @override
+  _OtpState createState() => _OtpState();
+}
+
+class _OtpState extends State<Otp> {
+  String smsCode;
+  TextEditingController controller = TextEditingController();
+  bool isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: Color.fromARGB(255, 251, 246, 246),
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(
+                    Icons.arrow_back,
+                    size: 32,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: Image.asset(
+                  'img/illustration-3.png',
+                ),
+              ),
+              SizedBox(
+                height: 24,
+              ),
+              Text(
+                'Verification',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text(
+                "Enter your OTP code number",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black38,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 28,
+              ),
+              Container(
+                padding: EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: [
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     _textFieldOTP(first: true, last: false, id: 0),
+                    //     _textFieldOTP(first: false, last: false, id: 1),
+                    //     _textFieldOTP(first: false, last: false, id: 2),
+                    //     _textFieldOTP(first: false, last: false, id: 3),
+                    //     _textFieldOTP(first: false, last: false, id: 4),
+                    //     _textFieldOTP(first: false, last: true, id: 5),
+                    //   ],
+                    // ),
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.numberWithOptions(),
+                      decoration: InputDecoration(
+                        labelText: "Enter Code",
+                      ),
+                      onChanged: (value) {
+                        smsCode = value;
+                      },
+                      maxLength: 6,
+                    ),
+                    SizedBox(
+                      height: 22,
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          PhoneAuthCredential phoneCredential =
+                              PhoneAuthProvider.credential(
+                                  verificationId: widget.vid, smsCode: smsCode);
+                          await FirebaseAuth.instance.currentUser
+                              .linkWithCredential(phoneCredential)
+                              .then((value) async {
+                            if (value.user != null) {
+                              debugPrint("Account Linked Successfully");
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .userData
+                                  .phone = value.user.phoneNumber;
+                              await Provider.of<UserProvider>(context,
+                                      listen: false)
+                                  .uploadUserData();
+                              Navigator.pushNamed(context, "/UserTabs");
+                            }
+                          }).onError<FirebaseAuthException>((e, stackTrace) {
+                            debugPrint(e.code);
+                            if (e.code.toLowerCase() ==
+                                "invalid-verification-code") {
+                              showToast(context, "Wrong Code Entered!");
+                            } else {}
+                          }).catchError((e) {
+                            debugPrint("Error: $e");
+                          });
+                        },
+                        // style: ButtonStyle(
+                        //   foregroundColor:
+                        //       MaterialStateProperty.all<Color>(Colors.white),
+                        //   backgroundColor:
+                        //       MaterialStateProperty.all<Color>(Colors.purple),
+                        //   shape:
+                        //       MaterialStateProperty.all<RoundedRectangleBorder>(
+                        //     RoundedRectangleBorder(
+                        //       borderRadius: BorderRadius.circular(24.0),
+                        //     ),
+                        //   ),
+                        // ),
+                        child: Padding(
+                          padding: EdgeInsets.all(14.0),
+                          child: isLoading
+                              ? CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : Text(
+                                  'Verify',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              Text(
+                "Didn't you receive any code?",
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black38,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              Text(
+                "Resend New Code",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: APP_COLOR,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _textFieldOTP({bool first, last, int id}) {
+    return Container(
+      height: 60,
+      padding: EdgeInsets.all(5),
+      child: AspectRatio(
+        aspectRatio: 0.9,
+        child: TextField(
+          autofocus: true,
+          onChanged: (value) {
+            smsCode[id].replaceRange(0, 0, value);
+            debugPrint("smsCode is: $smsCode $value");
+            if (value.length == 1 && last == false) {
+              FocusScope.of(context).nextFocus();
+            }
+            if (value.length == 0 && first == false) {
+              FocusScope.of(context).previousFocus();
+            }
+          },
+          showCursor: false,
+          readOnly: false,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          keyboardType: TextInputType.number,
+          maxLength: 1,
+          decoration: InputDecoration(
+            counter: Offstage(),
+            enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(width: 2, color: Colors.black12),
+                borderRadius: BorderRadius.circular(12)),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(width: 2, color: APP_COLOR),
+                borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ),
+    );
   }
 }

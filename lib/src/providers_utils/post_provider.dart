@@ -58,6 +58,7 @@ class PostProvider extends ChangeNotifier {
       debugPrint("$e");
     }
     notifyListeners();
+    await fetchAllPostes(uid);
   }
 
   Future<String> uploadDatingUserPhoto(File file, String path) async {
@@ -102,6 +103,7 @@ class PostProvider extends ChangeNotifier {
   }
 
   Future<void> deletePost(Post post) async {
+    posts.remove(post);
     await FirebaseFirestore.instance
         .collection('tempPostKeeper')
         .doc(uid)
@@ -119,6 +121,20 @@ class PostProvider extends ChangeNotifier {
           .catchError((e) => debugPrint("Error: $e"));
     });
     notifyListeners();
+    await AwesomeNotifications().cancel(post.notificationId);
+  }
+
+  Future<void> removeFromLive(Post post) async {
+    post.isLive = false;
+    livePosts.contains(post) ? livePosts.remove(post) : notifyListeners();
+    await FirebaseFirestore.instance
+        .collection('posts')
+        .doc(uid)
+        .collection('posts')
+        .doc(post.pid)
+        .update(post.toMap())
+        .then((value) => debugPrint("Post removed from live Successfully!"))
+        .catchError((e) => debugPrint("Error: $e"));
     await AwesomeNotifications().cancel(post.notificationId);
   }
 }

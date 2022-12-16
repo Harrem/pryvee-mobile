@@ -87,11 +87,11 @@ class ConversationProvider extends ChangeNotifier {
         .collection('messages')
         .add(msg.toMap())
         .then((value) async {
-      if (await getOneSignalUserId() != "")
-        NotificationServices().sendNotification(
-            [await getOneSignalUserId()], msg.text, fullName, profileUrl).then(
-          (response) => debugPrint("Notification sent"),
-        );
+      NotificationServices.sendNotification(
+              [nuid], msg.text, fullName, profileUrl)
+          .then(
+        (response) => debugPrint("Notification sent"),
+      );
       debugPrint("message Sent");
     }).catchError((e) => e);
   }
@@ -128,18 +128,27 @@ class ConversationProvider extends ChangeNotifier {
     });
   }
 
-  Future<Message> getLastMessage(int index) async {
-    var doc = await FirebaseFirestore.instance
-        .collection("conversations")
-        .doc(conversations[index].cid)
-        .collection("messages")
-        .orderBy('sentDate', descending: true)
-        .limit(1)
-        .get();
-    if (doc.docs.isEmpty) {
-      return null;
+  Future<Message> getLastMessage(uid) async {
+    String cid;
+    for (var conv in conversations) {
+      if (conv.user1 == uid || conv.user2 == uid) {
+        cid = conv.cid;
+        break;
+      }
     }
-    return Message.fromMap(doc.docs.first.data());
+    if (cid != null) {
+      var doc = await FirebaseFirestore.instance
+          .collection("conversations")
+          .doc(cid)
+          .collection("messages")
+          .orderBy('sentDate', descending: true)
+          .limit(1)
+          .get();
+      if (doc.docs.isNotEmpty) {
+        return Message.fromMap(doc.docs.first.data());
+      }
+    }
+    return null;
   }
 
   Future<WithUserData> getWithUser(String uid) async {

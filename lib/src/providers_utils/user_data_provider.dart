@@ -61,11 +61,19 @@ class UserProvider extends ChangeNotifier {
     ;
   }
 
-  Future<void> updatePassword(String password) async {
-    await auth.currentUser
-        .updatePassword(password)
-        .then((value) => debugPrint("Password Updated successfully"))
-        .catchError((e) => Future.error(e));
+  Future<void> updatePassword(String password, String newPassword) async {
+    await auth.signInWithEmailAndPassword(
+        email: auth.currentUser.email, password: password);
+    try {
+      await auth.currentUser
+          .updatePassword(newPassword)
+          .then((value) => debugPrint("Password Updated successfully"))
+          .catchError((e) => Future.error(e));
+    } on FirebaseAuthException catch (e) {
+      return Future.error(e.message);
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 
   Future<UserData> editUserInfoAPI(
@@ -135,8 +143,12 @@ class UserProvider extends ChangeNotifier {
   // }
 
   Future<void> updateUserData() async {
-    users.doc(auth.currentUser.uid).update(userData.toMap());
+    await users.doc(auth.currentUser.uid).update(userData.toMap());
     notifyListeners();
+  }
+
+  Future<void> updateUserDataWithMap(Map<String, dynamic> map) async {
+    await users.doc(auth.currentUser.uid).update(map);
   }
 
   void signOut() {

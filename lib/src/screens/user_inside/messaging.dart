@@ -43,7 +43,10 @@ class _MessageScreenState extends State<MessageScreen> {
         body: checkConv(conversationProvider.conversations, userActions.uid,
                     widget.toUser.uid) ==
                 null
-            ? CreateConversationWidget(withUser: widget.toUser)
+            ? CreateConversationWidget(
+                withUser: widget.toUser,
+                refresh: refresh,
+              )
             : SizedBox(
                 height: MediaQuery.of(context).size.height,
                 child: Column(
@@ -194,12 +197,13 @@ class _MessageScreenState extends State<MessageScreen> {
 }
 
 class CreateConversationWidget extends StatelessWidget {
-  const CreateConversationWidget({Key key, this.withUser}) : super(key: key);
+  const CreateConversationWidget({Key key, this.withUser, this.refresh})
+      : super(key: key);
   final WithUserData withUser;
+  final Function refresh;
   @override
   Widget build(BuildContext context) {
     final loadingProvider = Provider.of<LoadingProvider>(context);
-    final userActions = Provider.of<UserProvider>(context);
     final conversationProvider = Provider.of<ConversationProvider>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -248,8 +252,10 @@ class CreateConversationWidget extends StatelessWidget {
                 debugPrint("Conversation Created");
                 debugPrint("Conversation id: ${value.cid}");
               });
-
               loadingProvider.stop();
+              await Provider.of<ConversationProvider>(context, listen: false)
+                  .initConv();
+              refresh();
             },
             child: loadingProvider.isLoading
                 ? const SizedBox(

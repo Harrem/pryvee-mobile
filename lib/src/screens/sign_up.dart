@@ -1,4 +1,5 @@
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
+import 'package:pryvee/src/screens/user_inside/user_tabs.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomCircularProgressIndicatorWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/SocialMediaWidget.dart';
@@ -350,13 +351,18 @@ class _SignUpWidget extends State<SignUpWidget> {
                                                     !this.isLoading;
                                                 await userProvider
                                                     .initUserData();
-                                                Navigator.of(context)
-                                                    .pushNamedAndRemoveUntil(
-                                                        '/UserTabs',
-                                                        (Route<dynamic>
-                                                                route) =>
-                                                            false,
-                                                        arguments: 0);
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            Register()));
+
+                                                // Navigator.of(context)
+                                                //     .pushNamedAndRemoveUntil(
+                                                //         '/UserTabs',
+                                                //         (Route<dynamic>
+                                                //                 route) =>
+                                                //             false,
+                                                //         arguments: 0);
                                               }
                                             },
                                           ).catchError(
