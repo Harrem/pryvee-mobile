@@ -35,5 +35,10 @@ class NotificationController {
       MyApp.navigatorKey.currentState
           ?.pushNamed('/notification-page', arguments: receivedAction.id);
     }
+    if (receivedAction.buttonKeyPressed == "reply") {
+      // Navigate into pages, avoiding to open the notification details page over another details page already opened
+      MyApp.navigatorKey.currentState
+          ?.pushNamed('/notification-page', arguments: receivedAction.id);
+    }
   }
 }
