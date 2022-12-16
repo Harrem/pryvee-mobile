@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_local.dart';
@@ -38,11 +39,9 @@ void main() async {
   setupLocator();
 
   //Remove this method to stop OneSignal Debugging
-  OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+  // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
   OneSignal.shared.setAppId(kAppId);
-  var status = await OneSignal.shared.getDeviceState();
-  addOneSignalUserId(status.userId);
 // The promptForPushNotificationsWithUserResponse function will show the iOS or Android push notification prompt. We recommend removing the following code and instead using an In-App Message to prompt for notification permission
   OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
     print("Accepted permission: $accepted");
@@ -107,8 +106,24 @@ class _MyApp extends State<MyApp> {
   void initState() {
     super.initState();
     if (this.mounted) {
+      OneSignal.shared
+          .getDeviceState()
+          .then((status) => addOneSignalUserId(status.userId));
+
       addLocalLocationToSP("36.8089092" + "_" + "10.1363789");
     }
+    OneSignal.shared.setNotificationOpenedHandler(((openedResult) {
+      if (openedResult.action.actionId == 'reply') {
+        debugPrint(
+            " now Reply to the message!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        MyApp.navigatorKey.currentState.pushNamed('/notification-Page');
+      } else {
+        debugPrint(
+            "Notification Dismissed !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      }
+    }));
+    OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        ((event) => HapticFeedback.vibrate()));
     AwesomeNotifications().actionStream.listen((receivedAction) {
       debugPrint(receivedAction.toString() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       if (receivedAction.channelKey == 'basic_channel') {
