@@ -87,8 +87,9 @@ void clearSharedPrefsByKey(String key) async {
 }
 
 Future<void> pryveeSignOut(BuildContext context) async {
-  FirebaseAuth.instance.signOut();
+  context.read<UserProvider>().updateUserDataWithMap({'nuid': null});
   await AwesomeNotifications().cancelAll();
+  FirebaseAuth.instance.signOut();
   // Provider.of<LocaleLanguageNotifier>(context, listen: false)
   //     .setLocalLocaleLanguage(Locale("fr", "FR"));
   // Provider.of<ThemeNotifier>(context, listen: false).setLocalTheme(lightTheme);
