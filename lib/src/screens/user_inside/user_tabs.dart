@@ -1,20 +1,15 @@
 import 'package:country_picker/country_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:pryvee/data/data_source_local.dart';
 import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/screens/user_inside/conversation_screen.dart';
-import 'package:pryvee/src/screens/user_inside/edit_operations/edit_account.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
-import 'package:pryvee/src/utils/notification_services.dart';
-import 'package:pryvee/src/widgets/UserAvatarButtonWidget.dart';
 import 'package:pryvee/src/screens/user_inside/account.dart';
 import 'package:pryvee/src/models/commun_select_model.dart';
 import 'package:pryvee/src/screens/user_inside/posts.dart';
 import 'package:pryvee/src/screens/user_inside/home.dart';
 import 'package:pryvee/data/data_source_const.dart';
-import 'package:pryvee/data/data_source_get.dart';
 import 'package:pryvee/config/ui_icons.dart';
 import 'package:flutter/material.dart';
 
@@ -193,17 +188,17 @@ class _RegisterState extends State<Register> {
             padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             child: Column(
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Icon(
-                      Icons.arrow_back,
-                      size: 32,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
+                // Align(
+                //   alignment: Alignment.topLeft,
+                //   child: GestureDetector(
+                //     onTap: () => Navigator.pop(context),
+                //     child: Icon(
+                //       Icons.arrow_back,
+                //       size: 32,
+                //       color: Colors.black54,
+                //     ),
+                //   ),
+                // ),
                 SizedBox(
                   height: 18,
                 ),
@@ -211,7 +206,7 @@ class _RegisterState extends State<Register> {
                   width: 200,
                   height: 200,
                   decoration: BoxDecoration(
-                    color: Colors.deepPurple.shade50,
+                    color: Color.fromARGB(255, 251, 231, 231),
                     shape: BoxShape.circle,
                   ),
                   child: Image.asset(
@@ -329,8 +324,11 @@ class _RegisterState extends State<Register> {
                                         .linkWithCredential(phoneCredential)
                                         .then((value) => debugPrint(
                                             "Phone number linked to account"))
-                                        .catchError((e) => debugPrint(
-                                            "linking failed with error: $e"));
+                                        .catchError((e) {
+                                      showToast(context, "$e");
+                                      debugPrint(
+                                          "linking failed with error: $e");
+                                    });
                                     debugPrint("Verification Completed");
                                   },
                                   verificationFailed: (e) {
@@ -431,17 +429,13 @@ class _OtpState extends State<Otp> {
           padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
           child: Column(
             children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Icon(
-                    Icons.arrow_back,
-                    size: 32,
-                    color: Colors.black54,
-                  ),
-                ),
-              ),
+              // Align(
+              //   alignment: Alignment.topRight,
+              //   child: GestureDetector(
+              //     onTap: () => Navigator.pushNamed(context, "/UserTabs"),
+              //     child: Text("Skip"),
+              //   ),
+              // ),
               SizedBox(
                 height: 18,
               ),
@@ -539,7 +533,9 @@ class _OtpState extends State<Otp> {
                             if (e.code.toLowerCase() ==
                                 "invalid-verification-code") {
                               showToast(context, "Wrong Code Entered!");
-                            } else {}
+                            } else {
+                              showToast(context, e.message);
+                            }
                           }).catchError((e) {
                             debugPrint("Error: $e");
                           });
@@ -603,41 +599,41 @@ class _OtpState extends State<Otp> {
     );
   }
 
-  Widget _textFieldOTP({bool first, last, int id}) {
-    return Container(
-      height: 60,
-      padding: EdgeInsets.all(5),
-      child: AspectRatio(
-        aspectRatio: 0.9,
-        child: TextField(
-          autofocus: true,
-          onChanged: (value) {
-            smsCode[id].replaceRange(0, 0, value);
-            debugPrint("smsCode is: $smsCode $value");
-            if (value.length == 1 && last == false) {
-              FocusScope.of(context).nextFocus();
-            }
-            if (value.length == 0 && first == false) {
-              FocusScope.of(context).previousFocus();
-            }
-          },
-          showCursor: false,
-          readOnly: false,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          keyboardType: TextInputType.number,
-          maxLength: 1,
-          decoration: InputDecoration(
-            counter: Offstage(),
-            enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(width: 2, color: Colors.black12),
-                borderRadius: BorderRadius.circular(12)),
-            focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(width: 2, color: APP_COLOR),
-                borderRadius: BorderRadius.circular(12)),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _textFieldOTP({bool first, last, int id}) {
+  //   return Container(
+  //     height: 60,
+  //     padding: EdgeInsets.all(5),
+  //     child: AspectRatio(
+  //       aspectRatio: 0.9,
+  //       child: TextField(
+  //         autofocus: true,
+  //         onChanged: (value) {
+  //           smsCode[id].replaceRange(0, 0, value);
+  //           debugPrint("smsCode is: $smsCode $value");
+  //           if (value.length == 1 && last == false) {
+  //             FocusScope.of(context).nextFocus();
+  //           }
+  //           if (value.length == 0 && first == false) {
+  //             FocusScope.of(context).previousFocus();
+  //           }
+  //         },
+  //         showCursor: false,
+  //         readOnly: false,
+  //         textAlign: TextAlign.center,
+  //         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //         keyboardType: TextInputType.number,
+  //         maxLength: 1,
+  //         decoration: InputDecoration(
+  //           counter: Offstage(),
+  //           enabledBorder: OutlineInputBorder(
+  //               borderSide: BorderSide(width: 2, color: Colors.black12),
+  //               borderRadius: BorderRadius.circular(12)),
+  //           focusedBorder: OutlineInputBorder(
+  //               borderSide: BorderSide(width: 2, color: APP_COLOR),
+  //               borderRadius: BorderRadius.circular(12)),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 }

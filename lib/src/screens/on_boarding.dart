@@ -69,7 +69,9 @@ class _OnBoardingWidget extends State<OnBoardingWidget> {
   @override
   Widget build(BuildContext context) {
     return (FirebaseAuth.instance.currentUser != null)
-        ? UserTabsWidget()
+        ? FirebaseAuth.instance.currentUser.phoneNumber != null
+            ? UserTabsWidget()
+            : Register()
         : Scaffold(
             backgroundColor: APP_COLOR,
             appBar: AppBar(
