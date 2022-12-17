@@ -2,13 +2,9 @@ import 'package:contacts_service/contacts_service.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/add_operations/add_new_contact.dart';
-import 'package:pryvee/src/screens/user_inside/add_operations/add_new_post.dart';
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
-import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
-import 'package:pryvee/data/data_source_const.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class TrustedContacts extends StatefulWidget {
   TrustedContacts({Key key}) : super(key: key);

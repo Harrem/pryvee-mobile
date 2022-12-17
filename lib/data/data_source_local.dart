@@ -1,12 +1,8 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:pryvee/src/providers_utils/locale_language_notifier.dart';
-import 'package:pryvee/src/providers_utils/session_notifier.dart';
-import 'package:pryvee/src/providers_utils/theme_notifier.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:pryvee/src/utils/theme_utility.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -96,7 +92,6 @@ Future<void> pryveeSignOut(BuildContext context) async {
   // Provider.of<SessionNotifier>(context, listen: false).setLocalUserId("");
   clearSharedPrefs();
   Provider.of<UserProvider>(context, listen: false).signOut();
-  Navigator.of(context)
-      .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
+  Navigator.of(context).pushNamed('/');
   return;
 }

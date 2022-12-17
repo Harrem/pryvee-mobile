@@ -155,7 +155,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                           onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AddNewPosWidget())),
+                                  builder: (context) => AddNewPosWidget(
+                                        refreshParent: refresh,
+                                      ))),
                           child: Text("Going out?"),
                         ),
                       ],

@@ -6,13 +6,7 @@ import 'package:pryvee/src/widgets/PostItemWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
-import 'package:pryvee/data/data_source_set.dart';
-import 'package:pryvee/data/data_source_get.dart';
-import 'package:pryvee/src/models/post.dart';
 import 'package:flutter/material.dart';
-
-import '../../widgets/LivePostItemWidget.dart';
-// ignore_for_file: must_be_immutable
 
 class PostsWidget extends StatefulWidget {
   PostsWidget({Key key}) : super(key: key);

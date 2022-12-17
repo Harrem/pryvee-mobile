@@ -28,12 +28,6 @@ class LivePostItemWidget extends StatefulWidget {
 
 class _LivePostItemWidgetState extends State<LivePostItemWidget> {
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return CommunChipWidget(
       color: Theme.of(context).focusColor.withOpacity(0.4),
@@ -332,7 +326,7 @@ class _LivePostItemWidgetState extends State<LivePostItemWidget> {
                     Expanded(
                       child: GestureDetector(
                         onTap: () async {
-                          bool del = await showDialog(
+                          await showDialog(
                               context: context,
                               builder: (context) {
                                 return Dialog(

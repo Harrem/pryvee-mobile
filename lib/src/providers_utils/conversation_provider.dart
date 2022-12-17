@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../data/data_source_local.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
 import '../models/with_user_data.dart';

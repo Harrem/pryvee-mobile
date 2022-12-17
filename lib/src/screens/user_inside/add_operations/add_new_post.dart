@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:pryvee/src/providers_utils/post_provider.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
@@ -747,7 +746,6 @@ class _AddNewPosWidget extends State<AddNewPosWidget> {
                   ],
                 );
                 showToast(context, "Post Created!");
-                //TODO: refresh the view after poping
                 widget.refreshParent();
                 Navigator.pop(context);
               }).catchError((e) {

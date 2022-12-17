@@ -18,7 +18,6 @@ class PostItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context);
     return CommunChipWidget(
       color: Theme.of(context).focusColor.withOpacity(0.4),
       borderRadiusGeometry: BorderRadius.circular(8.0),

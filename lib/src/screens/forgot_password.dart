@@ -1,7 +1,6 @@
 import 'package:pryvee/src/utils/commun_mix_utility.dart';
 import 'package:pryvee/src/widgets/shared_inside/CustomCircularProgressIndicatorWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunTextButtonWidget.dart';
-import 'package:pryvee/src/widgets/shared_inside/SocialMediaWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/data/data_source_set.dart';
 import 'package:pryvee/config/ui_icons.dart';

@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pryvee/data/data_source_const.dart';
@@ -89,14 +86,11 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  @override
   static final navigatorKey = GlobalKey<NavigatorState>();
   _MyApp createState() => _MyApp();
 }
 
 class _MyApp extends State<MyApp> {
-  StreamSubscription<User> _sub;
-
   @override
   void dispose() {
     super.dispose();

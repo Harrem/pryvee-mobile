@@ -1,18 +1,12 @@
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:pryvee/src/models/conversation.dart';
 import 'package:pryvee/src/models/with_user_data.dart';
 import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/messaging.dart';
-import 'package:pryvee/src/widgets/shared_inside/CustomSearchBarWidget.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
-import 'package:pryvee/data/data_source_set.dart';
-import 'package:pryvee/data/data_source_get.dart';
 import 'package:flutter/material.dart';
 
-import '../../controllers/cloudStore.dart';
 import '../../models/message.dart';
 
 class ConversationScreen extends StatefulWidget {
