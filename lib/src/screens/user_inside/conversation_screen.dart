@@ -1,8 +1,11 @@
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:pryvee/src/models/conversation.dart';
 import 'package:pryvee/src/models/with_user_data.dart';
 import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:pryvee/src/screens/user_inside/messaging.dart';
+import 'package:pryvee/src/utils/date_utility.dart';
 import 'package:pryvee/src/widgets/shared_inside/CommunChipWidget.dart';
 import 'package:pryvee/data/data_source_const.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +24,8 @@ class _ConversationScreen extends State<ConversationScreen> {
 
   @override
   void initState() {
+    Provider.of<ConversationProvider>(context, listen: false).currentConv =
+        null;
     if (mounted) {}
     super.initState();
   }
@@ -63,34 +68,39 @@ class _ConversationScreen extends State<ConversationScreen> {
                               ),
                               Divider(),
                               ListView.builder(
-                                  physics: NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount:
-                                      userProvider.userData.contacts.length,
-                                  itemBuilder: (context, index) {
-                                    return InkWell(
-                                      onTap: () {
-                                        var toUser = userProvider
-                                            .userData.contacts[index];
-                                        var withUser = WithUserData(
-                                            fullName: toUser.fullName,
-                                            uid: toUser.uid,
-                                            isActive: false,
-                                            picture: toUser.picture);
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    MessageScreen(
-                                                        toUser: withUser)));
-                                      },
-                                      child: ListTile(
-                                        leading: Icon(Icons.person),
-                                        title: Text(userProvider
-                                            .userData.contacts[index].fullName),
-                                      ),
-                                    );
-                                  })
+                                physics: NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount:
+                                    userProvider.userData.contacts.length,
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      var toUser =
+                                          userProvider.userData.contacts[index];
+                                      var conv = Conv(
+                                          cid: null,
+                                          fullName: toUser.fullName,
+                                          uid: toUser.uid,
+                                          isActive: false,
+                                          profilePictureUrl: toUser != null
+                                              ? toUser.picture
+                                              : DEFAULT_USER_PICTURE);
+                                      conversationProvider.currentConv = conv;
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MessageScreen(),
+                                        ),
+                                      );
+                                    },
+                                    child: ListTile(
+                                      leading: Icon(Icons.person),
+                                      title: Text(userProvider
+                                          .userData.contacts[index].fullName),
+                                    ),
+                                  );
+                                },
+                              )
                             ],
                           )),
                         ),
@@ -163,37 +173,37 @@ class _ConversationScreen extends State<ConversationScreen> {
           ],
         ),
         SizedBox(height: 12.0),
-        FutureBuilder<List<WithUserData>>(
-          future: getWU(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-            if (snapshot.hasError) {
-              return Center(child: Text("error: ${snapshot.error}"));
-            }
-            if (snapshot.data == null || snapshot.data.isEmpty) {
-              return Center(child: Text("Start conversation with friends"));
-            }
+        FutureBuilder<List<Conv>>(
+            future: conversationProvider.getConvs(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasError) {
+                return Center(child: Text("error: ${snapshot.error}"));
+              }
+              if (snapshot.data == null || snapshot.data.isEmpty) {
+                return Center(child: Text("Start conversation with friends"));
+              }
 
-            return ListView.separated(
+              return ListView.separated(
                 physics: NeverScrollableScrollPhysics(),
                 separatorBuilder: (context, index) => SizedBox(height: 8.0),
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
-                  var withUser = snapshot.data[index];
+                  var conv = snapshot.data[index];
+
                   return InkWell(
                     onTap: () {
-                      conversationProvider.currentConv =
-                          conversationProvider.conversations[index];
+                      conversationProvider.currentConv = snapshot.data[index];
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MessageScreen(
-                            toUser: withUser,
-                          ),
+                              // toUser: conv,
+                              ),
                         ),
                       ).then((value) {
                         setState(() {});
@@ -202,69 +212,85 @@ class _ConversationScreen extends State<ConversationScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                           backgroundImage: NetworkImage(
-                              withUser.picture ?? DEFAULT_USER_PICTURE)),
-                      title: Text(withUser.fullName),
+                              conv.profilePictureUrl ?? DEFAULT_USER_PICTURE)),
+                      title: Text(conv.fullName),
                       subtitle: FutureBuilder<Message>(
-                          future:
-                              conversationProvider.getLastMessage(withUser.uid),
+                          future: conversationProvider.getLastMessage(conv.cid),
                           builder: (context, snapshot) {
+                            debugPrint("${conv.profilePictureUrl}");
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
-                              return Text("",
-                                  style: TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold));
+                              return Text(
+                                "",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
                             }
                             if (snapshot.data == null) {
-                              return Text("you started conversations");
+                              return Text(" ");
                             }
                             debugPrint("has data: ${snapshot.data}");
-                            return Text(
-                              snapshot.hasData ? snapshot.data.text : "",
-                              style: snapshot.data.fromUid == userProvider.uid
-                                  ? TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                    )
-                                  : !snapshot.data.didRead
-                                      ? TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold)
-                                      : TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 14,
-                                        ),
+                            return Row(
+                              children: [
+                                Container(
+                                  constraints: BoxConstraints(maxWidth: 200),
+                                  child: Text(
+                                    snapshot.hasData ? snapshot.data.text : "",
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                    style: snapshot.data.fromUid ==
+                                            userProvider.uid
+                                        ? TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 14,
+                                          )
+                                        : !snapshot.data.didRead
+                                            ? TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold)
+                                            : TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 14,
+                                              ),
+                                  ),
+                                ),
+                                Text(
+                                    " ${getDateFormetted(snapshot.data.sentDate)}"),
+                              ],
                             );
                           }),
-                      // trailing: Text(
-                      //     "${DateFormat.Md().format(conversationProvider.conversations[index].updatedDate)}"),
                     ),
                   );
-                });
-          },
-        )
+                  // });
+                },
+              );
+            })
       ],
     );
   }
 
-  Future<List<WithUserData>> getWU() async {
-    final conversationProvider = Provider.of<ConversationProvider>(context);
-    var conversations = conversationProvider.conversations;
-    List<WithUserData> list = [];
-    conversations.sort((a, b) =>
-        b.updatedDate.millisecond.compareTo(a.updatedDate.millisecond));
-    for (var e in conversations) {
-      WithUserData withUser;
-      if (e.user1 != conversationProvider.uid) {
-        withUser = await conversationProvider.getWithUser(e.user1);
-        if (!list.contains(withUser)) list.add(withUser);
-      } else {
-        withUser = await conversationProvider.getWithUser(e.user2);
-        if (!list.contains(withUser)) list.add(withUser);
-      }
-    }
-    return list;
-  }
+  // Future<List<WithUserData>> getWU() async {
+  //   final conversationProvider = Provider.of<ConversationProvider>(context);
+  //   var conversations = conversationProvider.conversations;
+  //   List<WithUserData> list = [];
+  //   if (conversations != null) {
+  //     conversations.sort((a, b) =>
+  //         b.updatedDate.millisecond.compareTo(a.updatedDate.millisecond));
+  //     for (var e in conversations) {
+  //       WithUserData withUser;
+  //       if (e.user1 != conversationProvider.uid) {
+  //         withUser = await conversationProvider.getWithUser(e.user1);
+  //         if (!list.contains(withUser)) list.add(withUser);
+  //       } else {
+  //         withUser = await conversationProvider.getWithUser(e.user2);
+  //         if (!list.contains(withUser)) list.add(withUser);
+  //       }
+  //     }
+  //   }
+  //   return list;
+  // }
 }

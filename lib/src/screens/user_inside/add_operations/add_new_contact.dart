@@ -165,12 +165,19 @@ class _AddNewContactWidgetState extends State<AddNewContactWidget> {
 
     contacts.forEach((contact) {
       if (contact.phones.isNotEmpty) {
-        var phoneNo = contact.phones.first.value;
-        docs.forEach((element) {
-          if (element.data()['phone'] == phoneNo) {
-            list.add(UserData.fromJson(element.data()));
-          }
-        });
+        for (var phone in contact.phones) {
+          var phoneNo = phone.value;
+          debugPrint(phoneNo);
+          docs.forEach((element) {
+            if (element
+                .data()['phone']
+                .toString()
+                .trim()
+                .endsWith(phoneNo.trim())) {
+              list.add(UserData.fromJson(element.data()));
+            }
+          });
+        }
       }
     });
     return list;

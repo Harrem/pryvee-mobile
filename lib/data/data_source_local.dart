@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -83,6 +84,7 @@ void clearSharedPrefsByKey(String key) async {
 }
 
 Future<void> pryveeSignOut(BuildContext context) async {
+  context.read<ConversationProvider>().reset();
   context.read<UserProvider>().updateUserDataWithMap({'nuid': null});
   await AwesomeNotifications().cancelAll();
   FirebaseAuth.instance.signOut();
@@ -91,7 +93,7 @@ Future<void> pryveeSignOut(BuildContext context) async {
   // Provider.of<ThemeNotifier>(context, listen: false).setLocalTheme(lightTheme);
   // Provider.of<SessionNotifier>(context, listen: false).setLocalUserId("");
   clearSharedPrefs();
-  Provider.of<UserProvider>(context, listen: false).signOut();
+  Provider.of<UserProvider>(context, listen: false).reset();
   Navigator.of(context).pushNamed('/');
   return;
 }

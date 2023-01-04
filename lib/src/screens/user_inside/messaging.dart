@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pryvee/data/data_source_const.dart';
 import 'package:pryvee/src/providers_utils/conversation_provider.dart';
 import 'package:pryvee/src/providers_utils/loading_provider.dart';
 import 'package:pryvee/src/providers_utils/user_data_provider.dart';
 
 import '../../models/conversation.dart';
 import '../../models/message.dart';
-import '../../models/with_user_data.dart';
+import '../../utils/date_utility.dart';
 
 class MessageScreen extends StatefulWidget {
-  const MessageScreen({Key key, this.toUser}) : super(key: key);
-  final WithUserData toUser;
+  const MessageScreen({Key key}) : super(key: key);
+  // final WithUserData toUser;
+  // final Conversation conversation;
 
   @override
   State<MessageScreen> createState() => _MessageScreenState();
@@ -33,18 +35,15 @@ class _MessageScreenState extends State<MessageScreen> {
   @override
   Widget build(BuildContext context) {
     final userActions = Provider.of<UserProvider>(context);
-    final conversationProvider = Provider.of<ConversationProvider>(context);
+    final convPr = Provider.of<ConversationProvider>(context);
     return ChangeNotifierProvider<LoadingProvider>(
       create: (context) => LoadingProvider(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.toUser.fullName),
+          title: Text(convPr.currentConv.fullName),
         ),
-        body: checkConv(conversationProvider.conversations, userActions.uid,
-                    widget.toUser.uid) ==
-                null
+        body: checkConv(convPr.convs, convPr.currentConv.uid) == null
             ? CreateConversationWidget(
-                withUser: widget.toUser,
                 refresh: refresh,
               )
             : SizedBox(
@@ -61,7 +60,7 @@ class _MessageScreenState extends State<MessageScreen> {
                               borderRadius: BorderRadius.circular(15),
                               color: Colors.transparent),
                           child: StreamBuilder(
-                            stream: conversationProvider.readMessage(),
+                            stream: convPr.readMessage(),
                             builder: (context,
                                 AsyncSnapshot<List<Message>> snapshot) {
                               if (snapshot.connectionState ==
@@ -98,7 +97,8 @@ class _MessageScreenState extends State<MessageScreen> {
                                             )
                                           : ChatBubbleOther(
                                               message: messages[index],
-                                              imageUrl: widget.toUser.picture,
+                                              imageUrl: convPr.currentConv
+                                                  .profilePictureUrl,
                                             );
                                     },
                                   );
@@ -145,11 +145,11 @@ class _MessageScreenState extends State<MessageScreen> {
                                     icon: const Icon(Icons.send),
                                     onPressed: () {
                                       if (message.isNotEmpty) {
-                                        conversationProvider.sendMessage(
+                                        convPr.sendMessage(
                                             message,
                                             userActions.uid,
                                             userActions.userData.fullName,
-                                            widget.toUser.nuid,
+                                            convPr.currentConv.nuid,
                                             userActions.userData.picture);
                                         _formKey.currentState.reset();
                                       }
@@ -180,31 +180,26 @@ class _MessageScreenState extends State<MessageScreen> {
     );
   }
 
-  Conversation checkConv(List<Conversation> convs, String uid1, String uid2) {
-    Conversation conversation;
+  Conv checkConv(List<Conv> convs, String uid) {
+    Conv conversation;
 
     for (var conv in convs) {
-      if (conv.user1 == uid1 && conv.user2 == uid2) {
-        conversation = conv;
-      } else if (conv.user2 == uid1 && conv.user1 == uid2) {
+      if (conv.uid == uid) {
         conversation = conv;
       }
     }
-
-    Provider.of<ConversationProvider>(context).currentConv = conversation;
     return conversation;
   }
 }
 
 class CreateConversationWidget extends StatelessWidget {
-  const CreateConversationWidget({Key key, this.withUser, this.refresh})
-      : super(key: key);
-  final WithUserData withUser;
+  const CreateConversationWidget({Key key, this.refresh}) : super(key: key);
   final Function refresh;
   @override
   Widget build(BuildContext context) {
     final loadingProvider = Provider.of<LoadingProvider>(context);
     final conversationProvider = Provider.of<ConversationProvider>(context);
+    final userProvider = Provider.of<UserProvider>(context);
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -213,7 +208,8 @@ class CreateConversationWidget extends StatelessWidget {
           child: Column(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage(withUser.picture),
+                backgroundImage: NetworkImage(
+                    conversationProvider.currentConv.profilePictureUrl),
                 radius: 50,
               ),
               const SizedBox(height: 25),
@@ -221,14 +217,14 @@ class CreateConversationWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    withUser.fullName,
+                    conversationProvider.currentConv.fullName,
                     style: Theme.of(context).textTheme.headline5,
                   ),
                 ],
               ),
               const SizedBox(height: 25),
               Text(
-                "You don't have conversation with ${withUser.fullName}",
+                "You don't have conversation with ${conversationProvider.currentConv.fullName}",
                 style: Theme.of(context).textTheme.subtitle2,
               ),
               const SizedBox(height: 5),
@@ -247,7 +243,8 @@ class CreateConversationWidget extends StatelessWidget {
               loadingProvider.start();
 
               await conversationProvider
-                  .createConversation(withUser.uid)
+                  .createConversation(
+                      userProvider.userData, conversationProvider.currentConv)
                   .then((value) {
                 debugPrint("Conversation Created");
                 debugPrint("Conversation id: ${value.cid}");
@@ -287,9 +284,21 @@ class ChatBubbleSelf extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-                color: Colors.red[200],
-                borderRadius: BorderRadius.circular(15)),
-            child: Text(message.text),
+                color: APP_COLOR, borderRadius: BorderRadius.circular(15)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  message.text,
+                  style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  getDateFormetted(message.sentDate),
+                  style: TextStyle(fontSize: 10, color: Colors.red[100]),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 10),
         ],
@@ -305,30 +314,44 @@ class ChatBubbleOther extends StatelessWidget {
   final String imageUrl;
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.end,
-          children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(imageUrl),
-              radius: 15,
-            ),
-            const SizedBox(width: 15),
-            Container(
-              constraints: const BoxConstraints(maxWidth: 100),
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.grey[300]),
-              child: Text(message.text,
-                  style: Theme.of(context).textTheme.bodyMedium),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-      ],
+    return FractionallySizedBox(
+      alignment: Alignment.centerLeft,
+      widthFactor: 0.7,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.end,
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(imageUrl),
+                radius: 15,
+              ),
+              const SizedBox(width: 15),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: Colors.grey[300]),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(message.text,
+                        style: Theme.of(context).textTheme.bodyMedium),
+                    SizedBox(height: 5),
+                    Text(
+                      getDateFormetted(message.sentDate),
+                      style: TextStyle(fontSize: 10, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+        ],
+      ),
     );
   }
 }

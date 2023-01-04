@@ -1,6 +1,8 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:pryvee/src/models/message.dart';
+import 'package:pryvee/src/models/with_user_data.dart';
 
 class Conversation {
   String cid;
@@ -99,5 +101,95 @@ class Conversation {
         user1.hashCode ^
         user2.hashCode ^
         lastMessage.hashCode;
+  }
+}
+
+class Conv {
+  String cid;
+  String uid;
+  String nuid;
+  String fullName;
+  bool isActive;
+  String profilePictureUrl;
+
+  Conv({
+    this.cid,
+    this.uid,
+    this.nuid,
+    this.fullName,
+    this.isActive,
+    this.profilePictureUrl,
+  });
+
+  Conv copyWith({
+    String cid,
+    String uid,
+    String nuid,
+    String fullName,
+    bool isActive,
+    String picture,
+  }) {
+    return Conv(
+      cid: cid ?? this.cid,
+      uid: uid ?? this.uid,
+      nuid: nuid ?? this.nuid,
+      fullName: fullName ?? this.fullName,
+      isActive: isActive ?? this.isActive,
+      profilePictureUrl: picture ?? this.profilePictureUrl,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'cid': cid,
+      'uid': uid,
+      'nuid': nuid,
+      'fullName': fullName,
+      'isActive': isActive,
+      'profilePictureUrl': profilePictureUrl,
+    };
+  }
+
+  factory Conv.fromMap(Map<String, dynamic> map) {
+    return Conv(
+      cid: map['cid'] as String,
+      uid: map['uid'] as String,
+      nuid: map['nuid'] as String,
+      fullName: map['fullName'] as String,
+      isActive: map['isActive'] as bool,
+      profilePictureUrl: map['profilePictureUrl'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Conv.fromJson(String source) =>
+      Conv.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'Conv(cid: $cid, uid: $uid, nuid: $nuid, fullName: $fullName, isActive: $isActive, profilePictureUrl: $profilePictureUrl)';
+  }
+
+  @override
+  bool operator ==(covariant Conv other) {
+    if (identical(this, other)) return true;
+
+    return other.cid == cid &&
+        other.uid == uid &&
+        other.nuid == nuid &&
+        other.fullName == fullName &&
+        other.isActive == isActive &&
+        other.profilePictureUrl == profilePictureUrl;
+  }
+
+  @override
+  int get hashCode {
+    return cid.hashCode ^
+        uid.hashCode ^
+        nuid.hashCode ^
+        fullName.hashCode ^
+        isActive.hashCode ^
+        profilePictureUrl.hashCode;
   }
 }

@@ -79,7 +79,6 @@ class DataSourceSet {
       lastName: lastName,
       createdAt: DateTime.now().toIso8601String(),
       picture: DEFAULT_USER_PICTURE,
-      conversations: [],
       contacts: [],
     );
 
@@ -88,6 +87,29 @@ class DataSourceSet {
     if (user != null)
       return user;
     else
+      return null;
+  }
+
+  Future<User> registerWithGoogleAPI(context) async {
+    var user = await AuthProvider.signInWithGoogle(context: context);
+
+    UserData userData = UserData(
+      uid: user.uid,
+      nuid: await getOneSignalUserId(),
+      email: user.email,
+      firstName: user.displayName.split(' ')[0],
+      lastName: user.displayName.split(' ')[1],
+      createdAt: DateTime.now().toIso8601String(),
+      picture: user.photoURL ?? DEFAULT_USER_PICTURE,
+      contacts: [],
+    );
+    if (user != null) {
+      var doc = await users.doc(user.uid).get();
+      if (!doc.exists) {
+        await users.doc(user.uid).set(userData.toMap());
+      }
+      return user;
+    } else
       return null;
   }
 

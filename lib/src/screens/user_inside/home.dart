@@ -92,8 +92,26 @@ class _HomeWidgetState extends State<HomeWidget> {
               SizedBox(height: 12.0),
               SizedBox(height: 12.0),
               Provider.of<PostProvider>(context).livePosts.length == 0
-                  ? Center(
-                      child: Text("You don't have any posts yet"),
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "you don't have any posts yet!",
+                          style: Theme.of(context).textTheme.headline4,
+                        ),
+                        SizedBox(height: 15.0),
+                        ElevatedButton(
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddNewPosWidget(
+                                refreshParent: refresh,
+                              ),
+                            ),
+                          ),
+                          child: Text("Going out?"),
+                        ),
+                      ],
                     )
                   : Row(
                       children: [
@@ -153,11 +171,13 @@ class _HomeWidgetState extends State<HomeWidget> {
                         ),
                         ElevatedButton(
                           onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => AddNewPosWidget(
-                                        refreshParent: refresh,
-                                      ))),
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddNewPosWidget(
+                                refreshParent: refresh,
+                              ),
+                            ),
+                          ),
                           child: Text("Going out?"),
                         ),
                       ],

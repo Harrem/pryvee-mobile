@@ -43,9 +43,9 @@ class _UserTabsWidget extends State<UserTabsWidget>
   void initState() {
     Provider.of<UserProvider>(context, listen: false)
         .initUserData()
-        .then((user) {
+        .then((user) async {
       final p = Provider.of<ConversationProvider>(context, listen: false);
-      p.initConv();
+      await p.initConv();
       if (this.mounted)
         setState(() {
           isLoading = false;
@@ -65,101 +65,106 @@ class _UserTabsWidget extends State<UserTabsWidget>
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    return DefaultTabController(
-      length: 4,
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          automaticallyImplyLeading: false,
-          elevation: 0,
-          leading: IconButton(
-            onPressed: () {},
-            splashRadius: 24.0,
-            icon: Icon(
-              Icons.sort,
-              size: 20.0,
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
-          title: Text(
-            this.communSelectModelList.elementAt(currentTab).name,
-            style: Theme.of(context).textTheme.headline4.merge(
-                  TextStyle(
+    return isLoading
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : DefaultTabController(
+            length: 4,
+            child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                automaticallyImplyLeading: false,
+                elevation: 0,
+                leading: IconButton(
+                  onPressed: () {},
+                  splashRadius: 24.0,
+                  icon: Icon(
+                    Icons.sort,
+                    size: 20.0,
                     color: Theme.of(context).colorScheme.secondary,
                   ),
                 ),
-          ),
-          actions: <Widget>[
-            isLoading
-                ? Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: CircleAvatar(
-                        backgroundImage: NetworkImage(DEFAULT_USER_PICTURE)),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: CircleAvatar(
-                        backgroundImage:
-                            NetworkImage(userProvider.userData.picture)),
-                  )
-          ],
-        ),
-        body: TabBarView(
-          physics: NeverScrollableScrollPhysics(),
-          controller: tabController,
-          children: [
-            HomeWidget(),
-            PostsWidget(),
-            ConversationScreen(),
-            AccountWidget(),
-          ],
-        ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () async {
-        //     Navigator.push(
-        //         context, MaterialPageRoute(builder: (context) => Register()));
-        //   },
-        //   child: Icon(Icons.phone),
-        // ),
-        bottomNavigationBar: SafeArea(
-          child: CurvedNavigationBar(
-            buttonBackgroundColor: APP_COLOR,
-            backgroundColor: Colors.transparent,
-            onTap: (int index) {
-              tabController.index = index;
-              debugPrint((tabController == null).toString());
-            },
-            index: currentTab,
-            animationDuration: Duration(milliseconds: 400),
-            animationCurve: Curves.easeOut,
-            color: APP_COLOR,
-            height: 50.0,
-            items: <Widget>[
-              Icon(
-                UiIcons.home,
-                size: 16.0,
-                color: Colors.white,
+                title: Text(
+                  this.communSelectModelList.elementAt(currentTab).name,
+                  style: Theme.of(context).textTheme.headline4.merge(
+                        TextStyle(
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                ),
+                actions: <Widget>[
+                  isLoading
+                      ? Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(DEFAULT_USER_PICTURE)),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(userProvider.userData.picture)),
+                        )
+                ],
               ),
-              Icon(
-                UiIcons.layers,
-                size: 16.0,
-                color: Colors.white,
+              body: TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: tabController,
+                children: [
+                  HomeWidget(),
+                  PostsWidget(),
+                  ConversationScreen(),
+                  AccountWidget(),
+                ],
               ),
-              Icon(
-                UiIcons.message_1,
-                size: 16.0,
-                color: Colors.white,
+              floatingActionButton: FloatingActionButton(
+                onPressed: () async {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Register()));
+                },
+                child: Icon(Icons.phone),
               ),
-              Icon(
-                UiIcons.user_1,
-                size: 16.0,
-                color: Colors.white,
+              bottomNavigationBar: SafeArea(
+                child: CurvedNavigationBar(
+                  buttonBackgroundColor: APP_COLOR,
+                  backgroundColor: Colors.transparent,
+                  onTap: (int index) {
+                    tabController.index = index;
+                    debugPrint((tabController == null).toString());
+                  },
+                  index: currentTab,
+                  animationDuration: Duration(milliseconds: 400),
+                  animationCurve: Curves.easeOut,
+                  color: APP_COLOR,
+                  height: 50.0,
+                  items: <Widget>[
+                    Icon(
+                      UiIcons.home,
+                      size: 16.0,
+                      color: Colors.white,
+                    ),
+                    Icon(
+                      UiIcons.layers,
+                      size: 16.0,
+                      color: Colors.white,
+                    ),
+                    Icon(
+                      UiIcons.message_1,
+                      size: 16.0,
+                      color: Colors.white,
+                    ),
+                    Icon(
+                      UiIcons.user_1,
+                      size: 16.0,
+                      color: Colors.white,
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            ),
+          );
   }
 }
 
@@ -173,6 +178,7 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   var phoneNoController = TextEditingController();
   var hasError = true;
+  var isLoading = false;
   Country country = CountryService().findByName('United States');
   @override
   Widget build(BuildContext context) {
@@ -182,23 +188,23 @@ class _RegisterState extends State<Register> {
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Color(0xfff7f6fb),
+        backgroundColor: Color.fromARGB(255, 251, 246, 246),
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(vertical: 24, horizontal: 32),
             child: Column(
               children: [
-                // Align(
-                //   alignment: Alignment.topLeft,
-                //   child: GestureDetector(
-                //     onTap: () => Navigator.pop(context),
-                //     child: Icon(
-                //       Icons.arrow_back,
-                //       size: 32,
-                //       color: Colors.black54,
-                //     ),
-                //   ),
-                // ),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Icon(
+                      Icons.arrow_back,
+                      size: 32,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 18,
                 ),
@@ -307,6 +313,9 @@ class _RegisterState extends State<Register> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () async {
+                            setState(() {
+                              isLoading = true;
+                            });
                             if (phoneNoController.value.text.isNotEmpty) {
                               String phoneNo =
                                   "+${country.phoneCode}${phoneNoController.text.trim()}";
@@ -341,8 +350,9 @@ class _RegisterState extends State<Register> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            Otp(vid: verificationId),
+                                        builder: (context) => Otp(
+                                            vid: verificationId,
+                                            resendToken: resendToken),
                                       ),
                                     );
                                   },
@@ -353,12 +363,15 @@ class _RegisterState extends State<Register> {
                             } else {
                               showToast(context, "Wrong Phone Number!");
                             }
+                            setState(() {
+                              isLoading = false;
+                            });
                           },
                           style: ButtonStyle(
                             foregroundColor:
                                 MaterialStateProperty.all<Color>(Colors.white),
                             backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.purple),
+                                MaterialStateProperty.all<Color>(APP_COLOR),
                             shape: MaterialStateProperty.all<
                                 RoundedRectangleBorder>(
                               RoundedRectangleBorder(
@@ -368,10 +381,14 @@ class _RegisterState extends State<Register> {
                           ),
                           child: Padding(
                             padding: EdgeInsets.all(14.0),
-                            child: Text(
-                              'Send',
-                              style: TextStyle(fontSize: 16),
-                            ),
+                            child: isLoading
+                                ? CircularProgressIndicator(
+                                    color: Colors.white,
+                                  )
+                                : Text(
+                                    'Send',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                           ),
                         ),
                       )
@@ -409,8 +426,10 @@ class _RegisterState extends State<Register> {
 }
 
 class Otp extends StatefulWidget {
-  const Otp({Key key, @required this.vid}) : super(key: key);
-  final String vid;
+  Otp({Key key, @required this.vid, @required this.resendToken})
+      : super(key: key);
+  String vid;
+  int resendToken;
   @override
   _OtpState createState() => _OtpState();
 }
@@ -429,13 +448,13 @@ class _OtpState extends State<Otp> {
           padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
           child: Column(
             children: [
-              // Align(
-              //   alignment: Alignment.topRight,
-              //   child: GestureDetector(
-              //     onTap: () => Navigator.pushNamed(context, "/UserTabs"),
-              //     child: Text("Skip"),
-              //   ),
-              // ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(Icons.arrow_back),
+                ),
+              ),
               SizedBox(
                 height: 18,
               ),
@@ -538,6 +557,7 @@ class _OtpState extends State<Otp> {
                             }
                           }).catchError((e) {
                             debugPrint("Error: $e");
+                            showToast(context, "$e");
                           });
                         },
                         // style: ButtonStyle(
@@ -583,15 +603,32 @@ class _OtpState extends State<Otp> {
               SizedBox(
                 height: 18,
               ),
-              Text(
-                "Resend New Code",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: APP_COLOR,
+              TextButton(
+                onPressed: () {
+                  FirebaseAuth.instance.verifyPhoneNumber(
+                    verificationCompleted: (phoneCred) {},
+                    verificationFailed: (e) {},
+                    codeSent: (vid, resendToken) {
+                      showToast(context, "Code Sent");
+                      widget.vid = vid;
+                      widget.resendToken = resendToken;
+                    },
+                    codeAutoRetrievalTimeout: (t) {
+                      showToast(context, "Code Time Out!: $t");
+                    },
+                    forceResendingToken: widget.resendToken,
+                  );
+                },
+                child: Text(
+                  "Resend New Code",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: APP_COLOR,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
+              )
             ],
           ),
         ),

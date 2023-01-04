@@ -15,6 +15,10 @@ class Post {
   int checkInterval;
   int updatedAt;
   int createdAt;
+  double currentLongitude;
+  double currentLatitude;
+  double dateUserLatitude;
+  double dateUserLongitude;
   String transport;
   String fullName;
   String phoneNumber;
@@ -41,7 +45,11 @@ class Post {
       this.pictureUrl,
       this.trustedUid,
       this.trustedUserName,
-      this.trustedUserPhoneNumber});
+      this.trustedUserPhoneNumber,
+      this.currentLatitude,
+      this.currentLongitude,
+      this.dateUserLatitude,
+      this.dateUserLongitude});
 
   factory Post.fromJson(Map<String, dynamic> json) => Post(
         notificationId: (json['id'] == null) ? 0 : json['id'] as int,
@@ -81,6 +89,18 @@ class Post {
         trustedUserName: (json['trustedUserName'] == null)
             ? ''
             : json['trustedUserName'].toString(),
+        currentLatitude: (json['currentLatitude'] == null)
+            ? 0
+            : json['currentLatitude'] as double,
+        currentLongitude: (json['currentLogitude'] == null)
+            ? 0
+            : json['currentLongitude'] as double,
+        dateUserLatitude: (json['dateUserLatitude'] == null)
+            ? 0
+            : json['dateUserLatitude'] as double,
+        dateUserLongitude: (json['dateUserLogitude'] == null)
+            ? 0
+            : json['dateUserLongitude'] as double,
       );
 
   Map<String, dynamic> toMap() {
@@ -103,6 +123,10 @@ class Post {
       'trustedUid': trustedUid,
       'trustedUserName': trustedUserName,
       'trustedUserPhoneNumber': trustedUserPhoneNumber,
+      'currentLongitude': currentLongitude,
+      'currentLatitude': currentLatitude,
+      'dateUserLongitude': dateUserLongitude,
+      'dateUserLatitude': dateUserLatitude
     };
   }
 
@@ -127,6 +151,18 @@ class Post {
       trustedUid: map['trustedUid'] as String,
       trustedUserName: map['trustedUserName'] as String,
       trustedUserPhoneNumber: map['trustedUserPhoneNumber'] as String,
+      currentLatitude: (map['currentLatitude'] == null)
+          ? 0
+          : map['currentLatitude'] as double,
+      currentLongitude: (map['currentLogitude'] == null)
+          ? 0
+          : map['currentLongitude'] as double,
+      dateUserLatitude: (map['dateUserLatitude'] == null)
+          ? 0
+          : map['dateUserLatitude'] as double,
+      dateUserLongitude: (map['dateUserLogitude'] == null)
+          ? 0
+          : map['dateUserLongitude'] as double,
     );
   }
 

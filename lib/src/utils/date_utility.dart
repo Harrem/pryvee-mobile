@@ -51,5 +51,18 @@ String getMMM(String date) {
       .format(getDateFromString(date)));
 }
 
+String getDateFormetted(DateTime dateTime) {
+  var duration = DateTime.now().difference(dateTime);
+  if (duration.inHours <= 24) {
+    return DateFormat.Hm().format(dateTime);
+  } else if (duration.inHours > 24 && duration.inDays <= 7) {
+    return DateFormat.E().format(dateTime);
+  } else if (duration.inDays > 7 && duration.inDays < 31) {
+    return DateFormat.MMMd().format(dateTime);
+  } else {
+    return DateFormat.yMMMd().format(dateTime);
+  }
+}
+
 bool isCurrrentDay(String value) =>
     value.toLowerCase() == getEEEE(DateTime.now().toString()).toLowerCase();

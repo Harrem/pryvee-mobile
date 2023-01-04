@@ -151,8 +151,9 @@ class UserProvider extends ChangeNotifier {
     await users.doc(auth.currentUser.uid).update(map);
   }
 
-  void signOut() {
-    uid = "";
+  void reset() {
+    uid = null;
+
     userData = null;
   }
 }

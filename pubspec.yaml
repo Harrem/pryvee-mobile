@@ -45,6 +45,9 @@ dependencies:
   flutter_screenutil: ^5.6.0
   onesignal_flutter: ^3.5.0
   country_picker: ^2.0.18
+  google_sign_in: ^5.4.2
+  flutter_facebook_auth: ^5.0.6
+  location: any
 
   flutter_localizations:
     sdk: flutter

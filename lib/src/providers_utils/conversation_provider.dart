@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:pryvee/src/models/user.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
 import '../models/with_user_data.dart';
@@ -10,7 +11,8 @@ class ConversationProvider extends ChangeNotifier {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   String uid = FirebaseAuth.instance.currentUser.uid;
   List<Conversation> conversations = [];
-  Conversation currentConv;
+  List<Conv> convs = [];
+  Conv currentConv;
   DocumentReference docRef;
   CollectionReference colRef =
       FirebaseFirestore.instance.collection('conversations');
@@ -22,21 +24,38 @@ class ConversationProvider extends ChangeNotifier {
         .doc(uid)
         .collection('conversations')
         .get();
-    var cids = docs.docs.map((e) => e.data()['cid'] as String).toList();
 
-    for (var cid in cids) {
-      docRef = colRef.doc(cid);
-      var snapshot = await docRef.get();
-      if (snapshot.exists && snapshot.data() != null) {
-        debugPrint(snapshot.data().toString());
-        var conversation = Conversation.fromMap(snapshot.data());
-        conversations.add(conversation);
-        debugPrint("conversation initialized!");
-      }
-    }
+    convs = docs.docs.map((e) => Conv.fromMap(e.data())).toList();
+    // var cids = docs.docs.map((e) => e.data()['cid'] as String).toList();
+
+    // for (var cid in cids) {
+    //   docRef = colRef.doc(cid);
+    //   var snapshot = await docRef.get();
+    //   if (snapshot.exists && snapshot.data() != null) {
+    //     debugPrint(snapshot.data().toString());
+    //     var conversation = Conversation.fromMap(snapshot.data());
+    //     conversations.add(conversation);
+    //     debugPrint("conversation initialized!");
+    //   }
+    // }
   }
 
-  Future<Conversation> createConversation(String toUid) async {
+  Future<List<Conv>> getConvs() async {
+    List<Conv> list = [];
+    var docs = await firestore
+        .collection('users')
+        .doc(uid)
+        .collection('conversations')
+        .get();
+    for (var doc in docs.docs) {
+      var a = Conv.fromMap(doc.data());
+      list.add(a);
+    }
+    return list;
+  }
+
+  Future<Conversation> createConversation(
+      UserData fromUser, Conv withUser) async {
     final docRef = await firestore.collection("conversations").doc();
     String cid = docRef.id;
 
@@ -45,7 +64,7 @@ class ConversationProvider extends ChangeNotifier {
         createdDate: DateTime.now(),
         updatedDate: DateTime.now(),
         user1: uid,
-        user2: toUid,
+        user2: withUser.uid,
         lastMessage: null);
 
     await docRef.set(conv.toMap());
@@ -55,17 +74,23 @@ class ConversationProvider extends ChangeNotifier {
     //     .doc(toUid)
     //     .collection("messageRequests")
     //     .add(wu.toMap());
+    var cidmap = {'cid': cid};
+    var withUserMap = withUser.toMap();
+    withUserMap.addEntries(cidmap.entries);
 
+    var fromUserData = WithUserData.fromMap(fromUser.toMap());
+    var fromUserMap = fromUserData.toMap();
+    fromUserMap.addEntries(cidmap.entries);
     await firestore
         .collection('users')
-        .doc(toUid)
+        .doc(withUser.uid)
         .collection("conversations")
-        .add({'cid': cid});
+        .add(fromUserMap);
     await firestore
         .collection('users')
         .doc(uid)
         .collection("conversations")
-        .add({'cid': cid});
+        .add(withUserMap);
     notifyListeners();
     return conv;
   }
@@ -86,23 +111,31 @@ class ConversationProvider extends ChangeNotifier {
         .collection('messages')
         .add(msg.toMap())
         .then((value) async {
-      NotificationServices.sendNotification(
-              [nuid], msg.text, fullName, profileUrl)
-          .then(
-        (response) => debugPrint("Notification sent"),
-      );
+      await firestore
+          .collection("conversations")
+          .doc(currentConv.cid)
+          .update({'updatedDate': msg.sentDate.millisecondsSinceEpoch});
+      await initConv();
+      if (nuid != null)
+        NotificationServices.sendNotification(
+                [nuid], msg.text, fullName, profileUrl)
+            .then(
+          (response) => debugPrint("Notification sent"),
+        );
       debugPrint("message Sent");
     }).catchError((e) => e);
   }
 
   Future<void> markAsRead() async {
-    currentConv.lastMessage.didRead = true;
+    // currentConv.lastMessage.didRead = true;
   }
 
   Stream<QuerySnapshot> readMessage1() {
     var res = firestore.collection("messages").orderBy('date').snapshots();
     return res;
   }
+
+  Future<void> updateConversations() async {}
 
   Stream<List<Conversation>> streamConversation() async* {
     for (var conv in conversations) {
@@ -127,14 +160,7 @@ class ConversationProvider extends ChangeNotifier {
     });
   }
 
-  Future<Message> getLastMessage(uid) async {
-    String cid;
-    for (var conv in conversations) {
-      if (conv.user1 == uid || conv.user2 == uid) {
-        cid = conv.cid;
-        break;
-      }
-    }
+  Future<Message> getLastMessage(cid) async {
     if (cid != null) {
       var doc = await FirebaseFirestore.instance
           .collection("conversations")
@@ -180,5 +206,11 @@ class ConversationProvider extends ChangeNotifier {
           .update(element.toMap())
           .then((value) => debugPrint("Conversations synced"));
     });
+  }
+
+  void reset() {
+    uid = null;
+    conversations = null;
+    docRef = null;
   }
 }

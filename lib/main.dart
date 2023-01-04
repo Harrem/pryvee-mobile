@@ -43,6 +43,14 @@ void main() async {
   OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
     print("Accepted permission: $accepted");
   });
+  var status = await OneSignal.shared.getDeviceState();
+  debugPrint("One Signal UserId: ${status.userId}");
+  if (status.userId != null)
+    await addOneSignalUserId(status.userId);
+  else {
+    await Future.delayed(Duration(seconds: 3));
+    await addOneSignalUserId(status.userId);
+  }
 
   await AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
@@ -100,10 +108,6 @@ class _MyApp extends State<MyApp> {
   void initState() {
     super.initState();
     if (this.mounted) {
-      OneSignal.shared
-          .getDeviceState()
-          .then((status) => addOneSignalUserId(status.userId));
-
       addLocalLocationToSP("36.8089092" + "_" + "10.1363789");
     }
     OneSignal.shared.setNotificationOpenedHandler(((openedResult) {
