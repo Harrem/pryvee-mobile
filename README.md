@@ -8,5 +8,3 @@ Key Features:
 - Chat Functionality: Real-time messaging with contacts.
 - Location Sharing: Share your location with trusted individuals.
 - Emergency Notifications: Receive push notifications for emergencies or non-responsive users.
-
-Please note that PryveeMobile prioritizes user privacy and data protection. Use the app responsibly and share your location only with trusted contacts.
