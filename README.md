@@ -1,4 +1,4 @@
-##PryveeMobile
+## PryveeMobile
 
 PryveeMobile is a personal project developed with Flutter that focuses on personal safety and connectivity. It enables user authentication through Firebase and offers features such as chat functionality, location sharing with trusted contacts, and emergency notifications. Stay connected and enhance your safety with PryveeMobile.
 
