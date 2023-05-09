@@ -1,16 +1,12 @@
-# Pryvee
+##PryveeMobile
 
-A new Flutter project.
+PryveeMobile is a personal project developed with Flutter that focuses on personal safety and connectivity. It enables user authentication through Firebase and offers features such as chat functionality, location sharing with trusted contacts, and emergency notifications. Stay connected and enhance your safety with PryveeMobile.
 
-## Getting Started
+Key Features:
 
-This project is a starting point for a Flutter application.
+- User Authentication: Secure login process with Firebase.
+- Chat Functionality: Real-time messaging with contacts.
+- Location Sharing: Share your location with trusted individuals.
+- Emergency Notifications: Receive push notifications for emergencies or non-responsive users.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Please note that PryveeMobile prioritizes user privacy and data protection. Use the app responsibly and share your location only with trusted contacts.
